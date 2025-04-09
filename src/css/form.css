@@ -1,0 +1,61 @@
+/* input container special Text */
+.input-container {
+  margin: 35px 0px;
+  position: relative;
+  z-index: 1;
+}
+.input-container .label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: all 0.3s ease;
+  color: white;
+  pointer-events: none;
+}
+.input-container input,
+.input-container textarea {
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid white;
+  outline: none;
+  width: 100%;
+  color: var(--white);
+}
+
+.input-container textarea {
+  field-sizing: content;
+}
+
+.input-container .underline {
+  width: 100%;
+  height: 2px;
+  background-color: var(--dark-pink);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: scaleX(0);
+  transition: all 0.3s ease;
+  /* box-shadow: 0 0 6px rgba(255, 255, 255, 0.541), 0 0 12px var(--pink); */
+}
+
+.input-container input[type="text"]:focus ~ .label,
+.input-container input[type="text"]:not(:placeholder-shown) ~ .label,
+.input-container input[type="email"]:focus ~ .label,
+.input-container input[type="email"]:not(:placeholder-shown) ~ .label,
+.input-container input[type="password"]:focus ~ .label,
+.input-container input[type="password"]:not(:placeholder-shown) ~ .label {
+  top: -20px;
+  font-size: 16px;
+  color: var(--dark-pink);
+}
+.input-container input[type="text"]:focus ~ .underline,
+.input-container input[type="text"]:not(:placeholder-shown) ~ .underline,
+.input-container input[type="email"]:focus ~ .underline,
+.input-container input[type="email"]:not(:placeholder-shown) ~ .underline,
+.input-container input[type="password"]:focus ~ .underline,
+.input-container input[type="password"]:not(:placeholder-shown) ~ .underline {
+  border-color: var(--white);
+  transform: scaleX(1);
+}
+
+/* fin input text */
