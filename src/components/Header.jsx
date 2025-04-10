@@ -7,6 +7,7 @@ export const Header = () => {
   return (
     <>
       <header>
+        <h1 className="title-app">NextChapter</h1>
         <div className="auth">
           {isLoggedIn ? (
             <button onClick={handleLogout} className="btn btn-danger">

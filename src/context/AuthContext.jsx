@@ -78,7 +78,7 @@ const AuthContextWrapper = ({ children }) => {
         {
           headers: {
             "Content-Type": "application/json",
-          },
+          }
         }
       );
       if (response.status === 201) {
