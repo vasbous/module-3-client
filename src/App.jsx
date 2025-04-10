@@ -11,6 +11,7 @@ import { SignUpPage } from "./pages/SignUpPage";
 import { HomePage } from "./pages/Homepage";
 import { DashBoardPage } from "./pages/DashBoardPage";
 import { TaskPage } from "./pages/TaskPage";
+import { DiaryPage } from "./pages/DiaryPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
@@ -34,6 +35,14 @@ function App() {
           element={
             <ProtectedRoute>
               <TaskPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/diary"
+          element={
+            <ProtectedRoute>
+              <DiaryPage />
             </ProtectedRoute>
           }
         />

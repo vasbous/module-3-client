@@ -29,7 +29,14 @@ const AuthContextWrapper = ({ children }) => {
           }
         );
         console.log("authenticate user function", responseFromVerifyRoute);
-        setCurrentUser(responseFromVerifyRoute.data.payload);
+        const currentUserData = await axios.get(
+          `${import.meta.env.VITE_API_URL}/user/${
+            responseFromVerifyRoute.data.payload._id
+          }`
+        );
+
+        console.log(currentUserData);
+        setCurrentUser(currentUserData);
         setIsLoading(false);
         setIsLoggedIn(true);
       } catch (error) {
@@ -78,7 +85,7 @@ const AuthContextWrapper = ({ children }) => {
         {
           headers: {
             "Content-Type": "application/json",
-          }
+          },
         }
       );
       if (response.status === 201) {
