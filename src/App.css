@@ -61,6 +61,12 @@ footer {
   align-items: center;
   gap: 10px;
 }
+.container-line {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
 .form-container,
 .calendar-container,
 .task-container,
@@ -121,11 +127,56 @@ footer {
         transparent 56px
       );
 }
-.task-page-container{
-  height: 70vh;
+
+/* TaskPage */
+.task-page-container {
+  height: calc(70vh - 3rem);
   width: 70vw;
+  overflow-y: auto;
+}
+.oneTask {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 36px;
+  transition: background 0.3s ease;
 }
 
+.oneTask.task-done {
+  opacity: 0.6;
+}
+
+.oneTask.task-done::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: red;
+  top: 50%;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: strikeThrough 0.4s ease forwards;
+}
+
+@keyframes strikeThrough {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.checkbox-task {
+  width: 54px;
+  text-align: center;
+}
+.content-task {
+  width: 35vw;
+}
+.oneTask i {
+  margin: 0 auto;
+  color: red;
+}
+/* End TaskPage */
 
 /* BUTTON */
 .btn {
@@ -175,6 +226,10 @@ h4,
   color: var(--white);
   font-weight: 900;
 }
+h2{
+  color: var(--white);
+  font-size: 2rem;
+}
 h3 {
   color: var(--white);
   font-size: 1.5rem;
@@ -209,8 +264,36 @@ h3 {
   .score-container {
     margin-bottom: 0;
   }
-  .task-page-container{
-    height: 70vh;
-    width: 50vw;
+  /* taskPage */
+  .task-page-container {
+    height: calc(70vh - 3rem);
+    width: 70vw;
   }
+  .previous-daily-task,
+  .next-daily-task {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(68vh - 3rem);
+    width: 10vw;
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5.3px);
+    -webkit-backdrop-filter: blur(5.3px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--dark-pink);
+  }
+  .previous-daily-task{
+    border-radius: 25px 0px 0px 25px;
+  }
+  .next-daily-task{
+    border-radius: 0px 25px 25px 0px;
+  }
+  .previous-daily-task:hover,
+  .next-daily-task:hover{
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.603);
+    color: var(--pink);
+  }
+  /* end taskPage */
 }
