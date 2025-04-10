@@ -58,4 +58,19 @@
   transform: scaleX(1);
 }
 
+.task-form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.task-form .input-container{
+  margin: 10px
+}
+.input-container .label-task{
+color: var(--green);
+}
+.input-task input{ 
+border-bottom: 2px solid var(--green);
+color: var(--pink);
+}
 /* fin input text */
