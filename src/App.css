@@ -121,6 +121,11 @@ footer {
         transparent 56px
       );
 }
+.task-page-container{
+  height: 70vh;
+  width: 70vw;
+}
+
 
 /* BUTTON */
 .btn {
@@ -203,5 +208,9 @@ h3 {
   .diary-container,
   .score-container {
     margin-bottom: 0;
+  }
+  .task-page-container{
+    height: 70vh;
+    width: 50vw;
   }
 }
