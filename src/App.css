@@ -64,7 +64,8 @@ footer {
 .form-container,
 .calendar-container,
 .task-container,
-.diary-container , .score-container {
+.diary-container,
+.score-container {
   box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
     rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,
     rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
@@ -82,15 +83,20 @@ footer {
   border-radius: 25px;
 }
 .calendar-container,
-.task-container, .diary-container , .score-container {
+.task-container,
+.diary-container,
+.score-container {
   height: max(90vh, 480px);
   width: 80vw;
-  
 }
-.task-container, .diary-container , .score-container {
+.task-container,
+.diary-container,
+.score-container {
   margin-bottom: 10px;
 }
-.calendar-container,.diary-container, .score-container {
+.calendar-container,
+.diary-container,
+.score-container {
   background: var(--blue);
   border-radius: 15px;
 }
@@ -98,6 +104,22 @@ footer {
 .task-container {
   background: var(--white);
   border-radius: 15px;
+  background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 35px,
+      var(--blue) 36px
+    ),
+    /* lignes horizontales */
+      linear-gradient(
+        to right,
+        transparent 0px,
+        transparent 50px,
+        #ffb0b0 50px,
+        #ffb0b0 52px,
+        transparent 50px,
+        transparent 56px
+      );
 }
 
 /* BUTTON */
@@ -160,24 +182,26 @@ h3 {
     height: calc(50vh - 10px);
     width: calc(40vw - 10px);
   }
-  .diary-container{
-    height: calc(34vh - 20px) ;
+  .diary-container {
+    height: calc(34vh - 20px);
     width: calc(40vw - 10px);
   }
   .score-container {
-    height: calc(16vh - 10px) ;
+    height: calc(16vh - 10px);
     width: calc(40vw - 10px);
   }
   .task-diary-score-container {
     display: flex;
-    gap: 20px
+    gap: 20px;
   }
-  .diary-score-container{
+  .diary-score-container {
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
-  .task-container, .diary-container , .score-container {
+  .task-container,
+  .diary-container,
+  .score-container {
     margin-bottom: 0;
   }
 }
