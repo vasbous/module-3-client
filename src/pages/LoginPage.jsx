@@ -26,39 +26,41 @@ export const LoginPage = () => {
 
   return (
     <>
-      <div className="form-container">
-        <h3 className="text-center">Login</h3>
-        <form onSubmit={handleLogin}>
-          <div className="input-container">
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder=" "
-              onChange={handleChange}
-            />
-            <label htmlFor="email" className="label">
-              Email
-            </label>
-            <div className="underline"></div>
-          </div>
-          <div className="input-container">
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder=" "
-              onChange={handleChange}
-            />
-            <label htmlFor="password" className="label">
-              Password
-            </label>
-            <div className="underline"></div>
-          </div>
-          <button type="submit" className="btn btn-success">
-            Sign In
-          </button>
-        </form>
+      <div className="container">
+        <div className="form-container">
+          <h3 className="text-center">Login</h3>
+          <form onSubmit={handleLogin}>
+            <div className="input-container">
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder=" "
+                onChange={handleChange}
+              />
+              <label htmlFor="email" className="label">
+                Email
+              </label>
+              <div className="underline"></div>
+            </div>
+            <div className="input-container">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder=" "
+                onChange={handleChange}
+              />
+              <label htmlFor="password" className="label">
+                Password
+              </label>
+              <div className="underline"></div>
+            </div>
+            <button type="submit" className="btn btn-success">
+              Sign In
+            </button>
+          </form>
+        </div>
       </div>
     </>
   );

@@ -27,58 +27,60 @@ export const SignUpPage = () => {
   };
 
   return (
-    <div className="form-container">
-      <form onSubmit={handleSubmit}>
-        <h3 className="text-center">Create Account</h3>
-        <div className="input-container">
-          <input
-            id="username"
-            type="text"
-            name="username"
-            placeholder=" "
-            value={userData.username}
-            onChange={handleChange}
-            required
-          />
-          <label htmlFor="username" className="label">
-            Username
-          </label>
-          <div className="underline"></div>
-        </div>
-        <div className="input-container">
-          <input
-            id="email"
-            type="email"
-            name="email"
-            placeholder=" "
-            value={userData.email}
-            onChange={handleChange}
-            required
-          />
-          <label htmlFor="email" className="label">
-            Email
-          </label>
-          <div className="underline"></div>
-        </div>
-        <div className="input-container">
-          <input
-            id="password"
-            type="password"
-            name="password"
-            placeholder=" "
-            value={userData.password}
-            onChange={handleChange}
-            required
-          />
-          <label htmlFor="password" className="label">
-            Password
-          </label>
-          <div className="underline"></div>
-        </div>
-        <button className="btn btn-success" type="submit">
-          Sign Up
-        </button>
-      </form>
+    <div className="container">
+      <div className="form-container">
+        <form onSubmit={handleSubmit}>
+          <h3 className="text-center">Create Account</h3>
+          <div className="input-container">
+            <input
+              id="username"
+              type="text"
+              name="username"
+              placeholder=" "
+              value={userData.username}
+              onChange={handleChange}
+              required
+            />
+            <label htmlFor="username" className="label">
+              Username
+            </label>
+            <div className="underline"></div>
+          </div>
+          <div className="input-container">
+            <input
+              id="email"
+              type="email"
+              name="email"
+              placeholder=" "
+              value={userData.email}
+              onChange={handleChange}
+              required
+            />
+            <label htmlFor="email" className="label">
+              Email
+            </label>
+            <div className="underline"></div>
+          </div>
+          <div className="input-container">
+            <input
+              id="password"
+              type="password"
+              name="password"
+              placeholder=" "
+              value={userData.password}
+              onChange={handleChange}
+              required
+            />
+            <label htmlFor="password" className="label">
+              Password
+            </label>
+            <div className="underline"></div>
+          </div>
+          <button className="btn btn-success" type="submit">
+            Sign Up
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
