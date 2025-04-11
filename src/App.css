@@ -226,7 +226,7 @@ h4,
   color: var(--white);
   font-weight: 900;
 }
-h2{
+h2 {
   color: var(--white);
   font-size: 2rem;
 }
@@ -283,17 +283,22 @@ h3 {
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: var(--dark-pink);
   }
-  .previous-daily-task{
+  .previous-daily-task {
     border-radius: 25px 0px 0px 25px;
   }
-  .next-daily-task{
+  .next-daily-task {
     border-radius: 0px 25px 25px 0px;
   }
   .previous-daily-task:hover,
-  .next-daily-task:hover{
+  .next-daily-task:hover {
     cursor: pointer;
     background: rgba(255, 255, 255, 0.603);
     color: var(--pink);
+  }
+  .diary-main-container {
+    margin: 10px 0px;
+    padding: 20px;
+    min-height: 80vh;
   }
   /* end taskPage */
 }

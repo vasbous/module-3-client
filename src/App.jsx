@@ -1,6 +1,4 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
 import "./css/form.css";
 import { Header } from "./components/Header";
@@ -12,6 +10,7 @@ import { HomePage } from "./pages/Homepage";
 import { DashBoardPage } from "./pages/DashBoardPage";
 import { TaskPage } from "./pages/TaskPage";
 import { DiaryPage } from "./pages/DiaryPage";
+import { DiaryEntry } from "./components/DiaryEntry";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
@@ -43,6 +42,22 @@ function App() {
           element={
             <ProtectedRoute>
               <DiaryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/diary/create"
+          element={
+            <ProtectedRoute>
+              <DiaryEntry />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/diary/edit/:diaryId"
+          element={
+            <ProtectedRoute>
+              <DiaryEntry />
             </ProtectedRoute>
           }
         />

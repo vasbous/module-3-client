@@ -50,7 +50,7 @@ export const TaskPage = () => {
     prevDay.setDate(prevDay.getDate() - 1);
     setDateTaskDisplay(prevDay);
   }
-  
+
   function goToNextDay() {
     const nextDay = new Date(dateTaskDisplay);
     nextDay.setDate(nextDay.getDate() + 1);
@@ -193,7 +193,7 @@ export const TaskPage = () => {
         )}
         <div className="container-line">
           <div className="previous-daily-task" onClick={goToPreviousDay}>
-            <i class="fa-solid fa-chevron-left"></i>
+            <i className="fa-solid fa-chevron-left"></i>
           </div>
           <div className="task-container task-page-container">
             {currentUser.plan && dailyTasks ? (
@@ -284,7 +284,7 @@ export const TaskPage = () => {
             )}
           </div>
           <div className="next-daily-task" onClick={goToNextDay}>
-            <i class="fa-solid fa-chevron-right"></i>
+            <i className="fa-solid fa-chevron-right"></i>
           </div>
         </div>
         <button className="btn btn-success" onClick={openForm}>

@@ -1,253 +1,228 @@
-import { useContext, useEffect, useState, useRef } from "react";
-import { AuthContext } from "../context/AuthContext";
+import React, { useState, useEffect, useContext, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import HTMLFlipBook from "react-pageflip";
 import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
 import "../css/DiaryPage.css";
 
 export const DiaryPage = () => {
-  const [diaryEntries, setDiaryEntries] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState("");
-  const [currentEditingId, setCurrentEditingId] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { currentUser } = useContext(AuthContext);
+  const [diaries, setDiaries] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { isLoggedIn } = useContext(AuthContext);
-  const notebookRef = useRef(null);
+  const [todayEntry, setTodayEntry] = useState(null);
+  const navigate = useNavigate();
+  const flipBookRef = useRef();
 
-  // Format date to a readable format
-  const formatDate = (dateString) => {
-    const options = {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+  // Function to format date as DD/MM/YYYY
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
-  // Fetch all diary entries
-  const fetchDiaryEntries = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/diary`,
-        {
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        }
-      );
+  // Check if a date is today
+  const isToday = (date) => {
+    const today = new Date();
+    const entryDate = new Date(date);
+    return (
+      entryDate.getDate() === today.getDate() &&
+      entryDate.getMonth() === today.getMonth() &&
+      entryDate.getFullYear() === today.getFullYear()
+    );
+  };
 
-      // Sort entries by date, newest first
-      const sortedEntries = response.data.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
+  // Split text into pages
+  const splitTextIntoPages = (text, charsPerPage = 600) => {
+    if (!text) return [""];
 
-      setDiaryEntries(sortedEntries);
-      setTotalPages(Math.ceil(sortedEntries.length / 2) + 1); // +1 for cover
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error fetching diary entries:", error);
-      setError("Failed to load your diary entries. Please try again later.");
-      setIsLoading(false);
+    const pages = [];
+    let currentPage = "";
+    const words = text.split(" ");
+
+    for (const word of words) {
+      if ((currentPage + word + " ").length > charsPerPage) {
+        pages.push(currentPage.trim());
+        currentPage = word + " ";
+      } else {
+        currentPage += word + " ";
+      }
     }
+
+    if (currentPage.trim().length > 0) {
+      pages.push(currentPage.trim());
+    }
+
+    return pages;
   };
 
   useEffect(() => {
-    if (isLoggedIn) {
-      fetchDiaryEntries();
-    }
-  }, [isLoggedIn]);
-
-  const handleTurnPage = (direction) => {
-    if (direction === "prev" && currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    } else if (direction === "next" && currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
-    }
-
-    // Apply the page turn effect
-    if (notebookRef.current) {
-      notebookRef.current.classList.add("page-turning");
-      setTimeout(() => {
-        notebookRef.current.classList.remove("page-turning");
-      }, 500);
-    }
-  };
-
-  const handleEditEntry = (entry) => {
-    setIsEditing(true);
-    setEditContent(entry.content);
-    setCurrentEditingId(entry._id);
-  };
-
-  const handleSaveEdit = async () => {
-    try {
-      await axios.patch(
-        `${import.meta.env.VITE_API_URL}/diary/${currentEditingId}`,
-        { content: editContent },
-        {
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
+    const fetchDiaries = async () => {
+      try {
+        if (!currentUser || !currentUser._id) {
+          setLoading(false);
+          return;
         }
-      );
 
-      setIsEditing(false);
-      setCurrentEditingId(null);
-      fetchDiaryEntries(); // Refresh the entries
-    } catch (error) {
-      console.error("Error updating diary entry:", error);
-      setError("Failed to update your entry. Please try again.");
+        // const response = await axios.get(
+        //   `${import.meta.env.VITE_API_URL}/diary/today`,
+        //   {
+        //     headers: {
+        //       authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        //     },
+        //   }
+        // );
+
+        // Sort diaries by date (newest first)
+        const sortedDiaries = currentUser.diaries.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        // Check if there's an entry for today
+        const todayEntryFound = sortedDiaries.find((diary) =>
+          isToday(diary.createdAt)
+        );
+        setTodayEntry(todayEntryFound);
+
+        setDiaries(sortedDiaries);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching diaries:", err);
+        setError("Failed to load diary entries");
+        setLoading(false);
+      }
+    };
+
+    fetchDiaries();
+  }, [currentUser]);
+
+  const handleCreateOrEdit = () => {
+    if (todayEntry) {
+      // Navigate to edit today's entry
+      navigate(`/diary/edit/${todayEntry._id}`);
+    } else {
+      // Navigate to create new entry
+      navigate("/diary/create");
     }
   };
 
-  const handleCreateNewEntry = () => {
-    // Navigate to dashboard to create a new entry
-    window.location.href = "/dashboard";
+  // Go back to dashboard
+  const handleBackToDashboard = () => {
+    navigate("/dashboard");
   };
 
-  const getEntriesForCurrentPage = () => {
-    if (currentPage === 0) return []; // Cover page
-
-    const startIdx = (currentPage - 1) * 2;
-    return diaryEntries.slice(startIdx, startIdx + 2);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="diary-page-container">
-        <div className="loading-indicator">Loading your diary entries...</div>
-      </div>
-    );
-  }
+  if (loading)
+    return <div className="container diary-loading">Loading your diary...</div>;
+  if (error) return <div className="container diary-error">{error}</div>;
 
   return (
-    <div className="diary-page-container">
-      {error && <div className="diary-error">{error}</div>}
+    <div className="container diary-main-container">
+      <div className="diary-buttons">
+        <button className="btn" onClick={handleBackToDashboard}>
+          Back To Dashboard
+        </button>
+        <button className="btn btn-success" onClick={handleCreateOrEdit}>
+          {todayEntry ? "Edit Today's Entry" : "Create New Entry"}
+        </button>
+      </div>
 
-      <div className="moleskine-notebook" ref={notebookRef}>
-        <div
-          className="notebook-cover"
-          style={{ display: currentPage === 0 ? "block" : "none" }}
-        >
-          <h1>My Journal</h1>
-          <div className="notebook-elastic"></div>
-        </div>
-
-        {currentPage > 0 && (
-          <div className="notebook-pages">
-            <div className="page page-left">
-              {getEntriesForCurrentPage()[0] && !isEditing && (
-                <>
-                  <div className="page-header">
-                    <div className="page-date">
-                      {formatDate(getEntriesForCurrentPage()[0].createdAt)}
-                    </div>
-                    <button
-                      className="edit-button"
-                      onClick={() =>
-                        handleEditEntry(getEntriesForCurrentPage()[0])
-                      }
-                    >
-                      Edit
-                    </button>
-                  </div>
-                  <div className="page-content">
-                    {getEntriesForCurrentPage()[0].content}
-                  </div>
-                </>
-              )}
-
-              {isEditing &&
-                currentEditingId === getEntriesForCurrentPage()[0]?._id && (
-                  <>
-                    <div className="page-header">
-                      <div className="page-date">
-                        {formatDate(getEntriesForCurrentPage()[0].createdAt)}
-                      </div>
-                      <button className="save-button" onClick={handleSaveEdit}>
-                        Save
-                      </button>
-                    </div>
-                    <textarea
-                      className="edit-textarea"
-                      value={editContent}
-                      onChange={(e) => setEditContent(e.target.value)}
-                    ></textarea>
-                  </>
-                )}
-            </div>
-
-            <div className="page page-right">
-              {getEntriesForCurrentPage()[1] && !isEditing && (
-                <>
-                  <div className="page-header">
-                    <div className="page-date">
-                      {formatDate(getEntriesForCurrentPage()[1].createdAt)}
-                    </div>
-                    <button
-                      className="edit-button"
-                      onClick={() =>
-                        handleEditEntry(getEntriesForCurrentPage()[1])
-                      }
-                    >
-                      Edit
-                    </button>
-                  </div>
-                  <div className="page-content">
-                    {getEntriesForCurrentPage()[1].content}
-                  </div>
-                </>
-              )}
-
-              {isEditing &&
-                currentEditingId === getEntriesForCurrentPage()[1]?._id && (
-                  <>
-                    <div className="page-header">
-                      <div className="page-date">
-                        {formatDate(getEntriesForCurrentPage()[1].createdAt)}
-                      </div>
-                      <button className="save-button" onClick={handleSaveEdit}>
-                        Save
-                      </button>
-                    </div>
-                    <textarea
-                      className="edit-textarea"
-                      value={editContent}
-                      onChange={(e) => setEditContent(e.target.value)}
-                    ></textarea>
-                  </>
-                )}
-            </div>
-
-            <div className="notebook-spine"></div>
+      <div className="diary-book-container">
+        {diaries.length === 0 ? (
+          <div className="empty-diary">
+            <p>Your diary is empty. Start writing today!</p>
           </div>
+        ) : (
+          <HTMLFlipBook
+            width={350}
+            height={500}
+            size="stretch"
+            minWidth={300}
+            maxWidth={500}
+            minHeight={400}
+            maxHeight={500}
+            showCover={true}
+            flippingTime={1000}
+            className="diary-book"
+            ref={flipBookRef}
+          >
+            {/* Cover page */}
+            <div className="diary-page cover">
+              <div className="cover-content">
+                <h1>My Journal</h1>
+                <p className="subtitle">
+                  {currentUser?.data?.username || "Personal Diary"}
+                </p>
+              </div>
+            </div>
+
+            {/* Blank page after cover */}
+            <div className="diary-page blank-page"></div>
+
+            {/* Diary entries */}
+            {diaries.flatMap((diary, diaryIndex) => {
+              const textPages = splitTextIntoPages(diary.content);
+
+              return textPages.map((pageContent, pageIndex) => (
+                <div
+                  key={`${diary._id}-page-${pageIndex}`}
+                  className="diary-page"
+                >
+                  {pageIndex === 0 && (
+                    <div className="page-header">
+                      <div className="page-date">
+                        {formatDate(diary.createdAt)}
+                      </div>
+                      <div className="page-mood">
+                        Mood: {diary.mood_score}/10
+                      </div>
+                    </div>
+                  )}
+                  <div className="page-content">
+                    {pageContent}
+                    {pageIndex === textPages.length - 1 &&
+                      diary.ai_response && (
+                        <div className="ai-response">
+                          <h4>AI Feedback:</h4>
+                          <p>{diary.ai_response}</p>
+                        </div>
+                      )}
+                  </div>
+                  <div className="page-number">
+                    {pageIndex + 1}/{textPages.length}
+                  </div>
+                </div>
+              ));
+            })}
+
+            {/* Last page */}
+            <div className="diary-page blank-page"></div>
+            <div className="diary-page cover back-cover">
+              <div className="cover-content">
+                <h2>Journal End</h2>
+              </div>
+            </div>
+          </HTMLFlipBook>
         )}
       </div>
 
-      <div className="diary-controls">
-        <button
-          className="btn page-turn-btn"
-          onClick={() => handleTurnPage("prev")}
-          disabled={currentPage === 0}
-        >
-          Previous Page
-        </button>
-
-        <button className="btn btn-success" onClick={handleCreateNewEntry}>
-          Create New Entry
-        </button>
-
-        <button
-          className="btn page-turn-btn"
-          onClick={() => handleTurnPage("next")}
-          disabled={currentPage === totalPages - 1}
-        >
-          Next Page
-        </button>
-      </div>
+      {diaries.length > 0 && (
+        <div className="diary-navigation">
+          <button
+            className="btn"
+            onClick={() => flipBookRef.current.pageFlip().flipPrev()}
+          >
+            Previous
+          </button>
+          <button
+            className="btn"
+            onClick={() => flipBookRef.current.pageFlip().flipNext()}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

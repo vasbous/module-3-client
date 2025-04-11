@@ -29,6 +29,7 @@ const AuthContextWrapper = ({ children }) => {
           }
         );
         console.log("authenticate user function", responseFromVerifyRoute);
+
         const currentUserData = await axios.get(
           `${import.meta.env.VITE_API_URL}/user/${
             responseFromVerifyRoute.data.payload._id
@@ -121,7 +122,7 @@ const AuthContextWrapper = ({ children }) => {
         loginUser,
         createUser,
         errorMessage,
-        refetchUser
+        refetchUser,
       }}
     >
       {children}
