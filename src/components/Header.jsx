@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 export const Header = () => {
@@ -7,7 +7,7 @@ export const Header = () => {
   return (
     <>
       <header>
-        <h1 className="title-app">NextChapter</h1>
+        <Link to="/dashboard"><h1 className="title-app">NextChapter</h1></Link>
         <div className="auth">
           {isLoggedIn ? (
             <button onClick={handleLogout} className="btn btn-danger">

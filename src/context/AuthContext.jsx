@@ -110,6 +110,18 @@ const AuthContextWrapper = ({ children }) => {
     setCurrentUser(res.data);
   };
 
+  // update user plan
+  async function updateUserPlan(newPlan){
+    try{
+      const userUpdate = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/user/update/plan/${currentUser._id}`,
+        { plan: newPlan }
+      );
+    }catch(err){
+      console.error(err)
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -123,6 +135,7 @@ const AuthContextWrapper = ({ children }) => {
         createUser,
         errorMessage,
         refetchUser,
+        updateUserPlan
       }}
     >
       {children}
