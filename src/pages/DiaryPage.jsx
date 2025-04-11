@@ -35,7 +35,7 @@ export const DiaryPage = () => {
   };
 
   // Split text into pages
-  const splitTextIntoPages = (text, charsPerPage = 600) => {
+  const splitTextIntoPages = (text, charsPerPage = 900) => {
     if (!text) return [""];
 
     const pages = [];
@@ -119,15 +119,6 @@ export const DiaryPage = () => {
 
   return (
     <div className="container diary-main-container">
-      <div className="diary-buttons">
-        <button className="btn" onClick={handleBackToDashboard}>
-          Back To Dashboard
-        </button>
-        <button className="btn btn-success" onClick={handleCreateOrEdit}>
-          {todayEntry ? "Edit Today's Entry" : "Create New Entry"}
-        </button>
-      </div>
-
       <div className="diary-book-container">
         {diaries.length === 0 ? (
           <div className="empty-diary">
@@ -152,7 +143,7 @@ export const DiaryPage = () => {
               <div className="cover-content">
                 <h1>My Journal</h1>
                 <p className="subtitle">
-                  {currentUser?.data?.username || "Personal Diary"}
+                  {currentUser?.username || "Personal Diary"}
                 </p>
               </div>
             </div>
@@ -209,17 +200,23 @@ export const DiaryPage = () => {
 
       {diaries.length > 0 && (
         <div className="diary-navigation">
+          <button className="btn btn-success" onClick={handleBackToDashboard}>
+            Back To Dashboard
+          </button>
           <button
-            className="btn"
+            className="btn btn-navi"
             onClick={() => flipBookRef.current.pageFlip().flipPrev()}
           >
             Previous
           </button>
           <button
-            className="btn"
+            className="btn btn-navi"
             onClick={() => flipBookRef.current.pageFlip().flipNext()}
           >
             Next
+          </button>
+          <button className="btn btn-success" onClick={handleCreateOrEdit}>
+            {todayEntry ? "Edit Today's Entry" : "Create New Entry"}
           </button>
         </div>
       )}

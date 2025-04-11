@@ -5,16 +5,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 10px;
   min-height: 80vh;
-}
-
-.diary-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 20px;
-  width: 100%;
 }
 
 .diary-book-container {
@@ -35,12 +27,12 @@
   background-color: #fff9f0;
   padding: 40px;
   border-radius: 0 5px 5px 0;
-  background-image: linear-gradient(
+  /* background-image: linear-gradient(
       to right,
       rgba(0, 0, 0, 0.05) 1px,
       transparent 1px
     ),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px); */
   background-size: 23px 23px;
   background-position: 0 4px;
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
@@ -198,6 +190,15 @@
   margin-top: 20px;
 }
 
+.btn-navi {
+  background-color: var(--blue);
+  border: 1px solid var(--blue);
+}
+.btn-navi:hover {
+  background-color: var(--green);
+  border: 1px solid var(--green);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .diary-book-container {
@@ -219,7 +220,7 @@
 
 @media (max-width: 480px) {
   .diary-book-container {
-    height: 500px;
+    height: 400px;
   }
 
   .diary-page {
@@ -234,10 +235,10 @@
     font-size: 2.5rem;
   }
 
-  .diary-buttons {
+  /* .diary-buttons {
     flex-direction: column;
     align-items: center;
-  }
+  } */
 }
 
 /* Page turn effect enhancement */
