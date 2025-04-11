@@ -50,7 +50,7 @@
   border-radius: 5px;
   box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
   overflow: hidden; /* Ensure image doesn't overflow */
-  background-image: url("../assets/diary-cover.jpg");
+  background-image: url("../assets/diary-cover2.jpg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: top;
