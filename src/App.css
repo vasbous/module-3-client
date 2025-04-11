@@ -127,6 +127,16 @@ footer {
         transparent 56px
       );
 }
+/* dashboard  */
+.daily-task-title-container{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px;
+}
+.daily-task-title-container h3{
+  color: var(--pink);
+}
 
 /* TaskPage */
 .task-page-container {
@@ -301,4 +311,7 @@ h3 {
     min-height: 80vh;
   }
   /* end taskPage */
+  a{
+    text-decoration: none;
+  }
 }

@@ -4,6 +4,7 @@ import { DailyTask } from "../components/DailyTask";
 import { useContext, useState } from "react";
 import { TaskContext } from "../context/TaskContext";
 import { AuthContext } from "../context/AuthContext";
+import { Link } from "react-router-dom";
   
 
 export const DashBoardPage = () => {
@@ -19,6 +20,11 @@ export const DashBoardPage = () => {
       <div className="calendar-container"></div>
       <div className="task-diary-score-container">
         <div className="task-container">
+          <div className="daily-task-title-container">
+            <div></div>
+            <h3>Daily task</h3>
+            <Link to="/task" className="btn btn-success">Task</Link>
+          </div>
           {
             dailyTasks? <DailyTask dailyTasks={dailyTasks}/> : <></>
           }
