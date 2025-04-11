@@ -4,6 +4,7 @@ import HTMLFlipBook from "react-pageflip";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import "../css/DiaryPage.css";
+import diaryCover from "../assets/diary-cover.jpg";
 
 export const DiaryPage = () => {
   const { currentUser } = useContext(AuthContext);
@@ -138,10 +139,16 @@ export const DiaryPage = () => {
             className="diary-book"
             ref={flipBookRef}
           >
-            {/* Cover page */}
+            {/* Front cover with image */}
             <div className="diary-page cover">
+              {/* <img
+                src={diaryCover} // Path to your front cover image
+                alt="Front Cover"
+                className="cover-image"
+              /> */}
               <div className="cover-content">
                 <h1>My Journal</h1>
+
                 <p className="subtitle">
                   {currentUser?.username || "Personal Diary"}
                 </p>
