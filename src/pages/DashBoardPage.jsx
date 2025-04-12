@@ -5,19 +5,48 @@ import { useContext, useState } from "react";
 import { TaskContext } from "../context/TaskContext";
 import { AuthContext } from "../context/AuthContext";
 import { Link } from "react-router-dom";
+import FullCalendar from '@fullcalendar/react'
+import dayGridPlugin from '@fullcalendar/daygrid'
+import interactionPlugin from "@fullcalendar/interaction";
   
 
 export const DashBoardPage = () => {
   const { tasksOfTheDay , dailyTasks} = useContext(TaskContext);
   const { currentUser} = useContext(AuthContext);
+  const [calendarEvents, setCalendarEvents] = useState({})
   useEffect(()=>{
     tasksOfTheDay()
+    const events = currentUser?.plan?.tasks?.map((oneTask) => {
+      const date = new Date(oneTask.date);
+      const hours = oneTask.time;
+      date.setHours(hours, 0, 0, 0)
+      return {
+        title: oneTask.task.content,
+        start: date.toISOString(),
+        id: oneTask._id
+      }
+    })
+    setCalendarEvents(events)
     
   }, [currentUser])
  
+ 
   return (
     <div className="container">
-      <div className="calendar-container"></div>
+      <div className="calendar-container">
+      <FullCalendar
+      plugins={[ dayGridPlugin , interactionPlugin]}
+      initialView="dayGridWeek"
+      events={calendarEvents}
+       height="100%"
+       eventTimeFormat={{
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false // 24H
+      }}
+      // dateClick={(info) => alert(`Tu as cliqué le ${info.dateStr}`)}
+    />
+      </div>
       <div className="task-diary-score-container">
         <div className="task-container">
           <div className="daily-task-title-container">
