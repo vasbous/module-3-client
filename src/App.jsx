@@ -12,6 +12,8 @@ import { TaskPage } from "./pages/TaskPage";
 import { DiaryPage } from "./pages/DiaryPage";
 import { DiaryEntry } from "./components/DiaryEntry";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { SignupQuestionsPage } from "./pages/SignupQuestionsPage";
+import { ProtectedQuestionRoute } from "./components/ProtectedQuestionRoute";
 
 function App() {
   return (
@@ -22,43 +24,51 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route
-          path="/dashboard"
+          path="/signup-questions"
           element={
             <ProtectedRoute>
-              <DashBoardPage />
+              <SignupQuestionsPage />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedQuestionRoute>
+              <DashBoardPage />
+            </ProtectedQuestionRoute>
           }
         />
         <Route
           path="/task"
           element={
-            <ProtectedRoute>
+            <ProtectedQuestionRoute>
               <TaskPage />
-            </ProtectedRoute>
+            </ProtectedQuestionRoute>
           }
         />
         <Route
           path="/diary"
           element={
-            <ProtectedRoute>
+            <ProtectedQuestionRoute>
               <DiaryPage />
-            </ProtectedRoute>
+            </ProtectedQuestionRoute>
           }
         />
         <Route
           path="/diary/create"
           element={
-            <ProtectedRoute>
+            <ProtectedQuestionRoute>
               <DiaryEntry />
-            </ProtectedRoute>
+            </ProtectedQuestionRoute>
           }
         />
         <Route
           path="/diary/edit/:diaryId"
           element={
-            <ProtectedRoute>
+            <ProtectedQuestionRoute>
               <DiaryEntry />
-            </ProtectedRoute>
+            </ProtectedQuestionRoute>
           }
         />
       </Routes>

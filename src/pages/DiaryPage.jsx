@@ -147,11 +147,7 @@ export const DiaryPage = () => {
                 className="cover-image"
               /> */}
               <div className="cover-content">
-                <h1>My Journal</h1>
-
-                <p className="subtitle">
-                  {currentUser?.username || "Personal Diary"}
-                </p>
+                <h1>{currentUser?.username}'s Journal</h1>
               </div>
             </div>
 

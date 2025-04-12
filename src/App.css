@@ -40,7 +40,7 @@ header {
   padding: 0 20px;
 }
 footer {
-  height: 12vh ;
+  height: 12vh;
   border-radius: 5px 5px 0px 0px;
   background: var(--pink);
 }
@@ -128,13 +128,13 @@ footer {
       );
 }
 /* dashboard  */
-.daily-task-title-container{
+.daily-task-title-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 5px;
 }
-.daily-task-title-container h3{
+.daily-task-title-container h3 {
   color: var(--pink);
 }
 
@@ -244,9 +244,152 @@ h3 {
   color: var(--white);
   font-size: 1.5rem;
 }
-a{
+a {
   text-decoration: none;
 }
+
+.signup-questions-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: min(80vw, 600px);
+  min-height: min(80vh, 600px);
+  margin: auto;
+  background-color: var(--blue);
+  border-radius: 25px;
+  padding: 30px 20px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,
+    rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+}
+
+.progress-tracker {
+  font-family: "Fredoka", sans-serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--dark-pink);
+  background-color: var(--white);
+  padding: 8px 15px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+}
+
+.goal-instruction {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--white);
+}
+
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.goal-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  background-color: var(--white);
+  border-radius: 15px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.goal-card h4 {
+  font-family: "Fredoka", sans-serif;
+  font-weight: 600;
+  color: var(--dark-pink);
+  text-align: center;
+}
+
+.goal-card:hover {
+  transform: translateY(-5px);
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px;
+}
+
+.goal-card.selected {
+  background-color: var(--green);
+  border: 2px solid var(--dark-pink);
+}
+
+.question-container {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.number-input-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.number-input {
+  width: 150px;
+  height: 50px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  text-align: center;
+  background-color: var(--white);
+  color: var(--dark-pink);
+  outline: none;
+}
+
+.options-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  min-height: 50px;
+  padding: 10px 15px;
+  background-color: var(--white);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.option-card:hover {
+  background-color: var(--yellow);
+}
+
+.option-card.selected {
+  background-color: var(--green);
+  border: 2px solid var(--dark-pink);
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 300px;
+  margin-top: 20px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+  font-size: 1.5rem;
+  color: var(--dark-pink);
+}
+
 @media only screen and (min-width: 680px) {
   .calendar-container {
     height: 30vh;
@@ -314,5 +457,13 @@ a{
     min-height: 80vh;
   }
   /* end taskPage */
-  
+
+  .signup-questions-container {
+    width: 90vw;
+    padding: 20px 15px;
+  }
+
+  .goals-grid {
+    grid-template-columns: 1fr;
+  }
 }

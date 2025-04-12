@@ -80,7 +80,7 @@
 .cover-content h1 {
   font-family: "Caveat", cursive;
   font-size: 4rem;
-  color: white;
+  color: rgb(214, 214, 213);
   margin-bottom: 20px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
