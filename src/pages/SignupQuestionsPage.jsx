@@ -20,7 +20,8 @@ export const SignupQuestionsPage = () => {
     console.log("Current question index:", currentQuestionIndex);
     console.log("Questions array:", questions);
     console.log("Selected goal:", selectedGoal);
-  }, [currentQuestionIndex, questions, selectedGoal]);
+    console.log("Current answers:", answers);
+  }, [currentQuestionIndex, questions, selectedGoal, answers]);
 
   // Fetch goals on component mount
   useEffect(() => {
@@ -72,7 +73,16 @@ export const SignupQuestionsPage = () => {
             const savedAnswers = {};
             goalDetails.questions.forEach((question) => {
               if (question.user_answer) {
-                savedAnswers[question.title] = question.user_answer;
+                // If the question is multi-selection, convert comma-separated string back to array
+                if (
+                  question.type === "multiple" &&
+                  typeof question.user_answer === "string"
+                ) {
+                  savedAnswers[question.title] =
+                    question.user_answer.split(",");
+                } else {
+                  savedAnswers[question.title] = question.user_answer;
+                }
               }
             });
             setAnswers(savedAnswers);
@@ -98,6 +108,11 @@ export const SignupQuestionsPage = () => {
 
   // Handler for goal selection
   const handleGoalSelection = (goalName) => {
+    // If changing from a previously selected goal, clear all answers
+    if (selectedGoal && selectedGoal !== goalName) {
+      setAnswers({});
+    }
+
     setSelectedGoal(goalName);
     const selectedGoalData = goals.find((goal) => goal.name === goalName);
     console.log("Selected goal data:", selectedGoalData);
@@ -150,8 +165,10 @@ export const SignupQuestionsPage = () => {
         );
 
         // Create a new goal details structure that mirrors the goal structure
+        // This will overwrite any previous goal details
         goalDetails = {
           selectedGoal: newData.selectedGoal,
+          // name: selectedGoalData.name,
           questions: selectedGoalData.questions.map((q) => ({
             ...q,
             user_answer: null, // Initialize with null answers
@@ -162,12 +179,17 @@ export const SignupQuestionsPage = () => {
       else {
         // We're updating an answer to a specific question
         const [questionTitle] = Object.keys(newData);
-        const answer = newData[questionTitle];
+        let answer = newData[questionTitle];
 
         // Update the specific question's user_answer
         if (goalDetails.questions) {
           goalDetails.questions = goalDetails.questions.map((q) => {
             if (q.title === questionTitle) {
+              // Convert array to comma-separated string for multiple type questions
+              if (q.type === "multiple" && Array.isArray(answer)) {
+                answer = answer.join(",");
+              }
+
               return {
                 ...q,
                 user_answer: answer,
@@ -225,6 +247,17 @@ export const SignupQuestionsPage = () => {
       return;
     }
 
+    // For multiple selection questions, make sure at least one option is selected
+    if (
+      (currentQuestion.type === "multiple" ||
+        currentQuestion.type === "multi-selection") &&
+      (!answers[currentQuestion.title] ||
+        answers[currentQuestion.title].length === 0)
+    ) {
+      alert("Please select at least one option to continue");
+      return;
+    }
+
     // Save progress for this question
     await saveProgress({
       [currentQuestion.title]: answers[currentQuestion.title],
@@ -243,8 +276,11 @@ export const SignupQuestionsPage = () => {
 
   // Navigate to previous question
   const handlePrevious = () => {
-    if (currentQuestionIndex > -1) {
+    if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
+    } else if (currentQuestionIndex === 0) {
+      // Go back to goal selection
+      setCurrentQuestionIndex(-1);
     }
   };
 
@@ -313,6 +349,13 @@ export const SignupQuestionsPage = () => {
       <div className="question-container">
         <h3 className="text-center">{questionText}</h3>
 
+        {/* Display prompt for multiple selection questions */}
+        {(type === "multiple" || type === "multi-selection") && (
+          <p className="multiple-selection-prompt">
+            (You can pick more than one answer)
+          </p>
+        )}
+
         {type === "number" && (
           <div className="number-input-container">
             <input
@@ -340,7 +383,7 @@ export const SignupQuestionsPage = () => {
           </div>
         )}
 
-        {type === "multi-selection" && (
+        {(type === "multiple" || type === "multi-selection") && (
           <div className="options-container">
             {answer_choices.map((choice, index) => {
               const isSelected = (answers[title] || []).includes(choice);
