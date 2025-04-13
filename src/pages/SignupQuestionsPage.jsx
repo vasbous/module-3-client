@@ -168,7 +168,6 @@ export const SignupQuestionsPage = () => {
         // This will overwrite any previous goal details
         goalDetails = {
           selectedGoal: newData.selectedGoal,
-          // name: selectedGoalData.name,
           questions: selectedGoalData.questions.map((q) => ({
             ...q,
             user_answer: null, // Initialize with null answers

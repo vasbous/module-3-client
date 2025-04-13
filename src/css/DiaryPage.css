@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap");
 
 .diary-main-container {
   display: flex;
@@ -27,12 +28,6 @@
   background-color: #fff9f0;
   padding: 40px;
   border-radius: 0 5px 5px 0;
-  /* background-image: linear-gradient(
-      to right,
-      rgba(0, 0, 0, 0.05) 1px,
-      transparent 1px
-    ),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px); */
   background-size: 23px 23px;
   background-position: 0 4px;
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
@@ -42,14 +37,14 @@
 
 /* Cover styling */
 .diary-page.cover {
-  background-color: transparent; /* Remove background color */
+  background-color: transparent;
   display: flex;
   padding: 0;
   justify-content: center;
   align-items: center;
   border-radius: 5px;
   box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
-  overflow: hidden; /* Ensure image doesn't overflow */
+  overflow: hidden;
   background-image: url("../assets/diary-cover2.jpg");
   background-repeat: no-repeat;
   background-size: cover;
@@ -61,9 +56,9 @@
 }
 
 .cover-image {
-  width: 100%; /* Make image fill the cover */
+  width: 100%;
   height: 100%;
-  object-fit: cover; /* Maintain aspect ratio and cover the area */
+  object-fit: cover;
   z-index: 1;
 }
 
@@ -128,6 +123,42 @@
   overflow: hidden;
 }
 
+.user-content {
+  font-family: "Kalam", cursive;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+.mixed-content {
+  font-family: "Kalam", cursive;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+.ai-response-header {
+  font-family: "Caveat", cursive;
+  font-size: 1.3rem;
+  color: var(--dark-pink);
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+
+.ai-response-text {
+  font-family: "Quicksand", sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #555;
+  font-style: italic;
+}
+
+/* Add spacing between user content and AI response */
+.mixed-content br + .ai-response-header {
+  margin-top: 15px;
+}
+
 .page-number {
   position: absolute;
   bottom: 20px;
@@ -135,27 +166,6 @@
   font-family: "Caveat", cursive;
   font-size: 0.9rem;
   color: #888;
-}
-
-/* AI Response styling */
-.ai-response {
-  margin-top: 30px;
-  padding-top: 10px;
-  border-top: 1px dashed #ccc;
-}
-
-.ai-response h4 {
-  font-family: "Caveat", cursive;
-  font-size: 1.3rem;
-  color: var(--dark-pink);
-  margin-bottom: 10px;
-}
-
-.ai-response p {
-  font-family: "Kalam", cursive;
-  font-size: 1rem;
-  font-style: italic;
-  color: #555;
 }
 
 /* Empty diary state */
@@ -246,11 +256,6 @@
   .cover-content h1 {
     font-size: 2.5rem;
   }
-
-  /* .diary-buttons {
-    flex-direction: column;
-    align-items: center;
-  } */
 }
 
 /* Page turn effect enhancement */

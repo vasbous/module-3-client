@@ -28,7 +28,6 @@ const AuthContextWrapper = ({ children }) => {
             },
           }
         );
-        console.log("authenticate user function", responseFromVerifyRoute);
 
         const currentUserData = await axios.get(
           `${import.meta.env.VITE_API_URL}/user/${
@@ -36,7 +35,6 @@ const AuthContextWrapper = ({ children }) => {
           }`
         );
 
-        console.log(currentUserData.data);
         setCurrentUser(currentUserData.data);
         setIsLoading(false);
         setIsLoggedIn(true);

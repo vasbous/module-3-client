@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import HTMLFlipBook from "react-pageflip";
-import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import "../css/DiaryPage.css";
-import diaryCover from "../assets/diary-cover.jpg";
 
 export const DiaryPage = () => {
   const { currentUser } = useContext(AuthContext);
@@ -13,6 +11,7 @@ export const DiaryPage = () => {
   const [error, setError] = useState(null);
   const [todayEntry, setTodayEntry] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const flipBookRef = useRef();
 
   // Function to format date as DD/MM/YYYY
@@ -35,69 +34,119 @@ export const DiaryPage = () => {
     );
   };
 
-  // Split text into pages
-  const splitTextIntoPages = (text, charsPerPage = 900) => {
-    if (!text) return [""];
+  // Improved split content function that keeps AI response with user content when possible
+  const splitContentIntoPages = (diary, charsPerPage = 900) => {
+    if (!diary) return [];
 
     const pages = [];
-    let currentPage = "";
-    const words = text.split(" ");
+    const userContent = diary.content || "";
+    const aiResponse = diary.ai_response || "";
 
-    for (const word of words) {
-      if ((currentPage + word + " ").length > charsPerPage) {
-        pages.push(currentPage.trim());
-        currentPage = word + " ";
-      } else {
-        currentPage += word + " ";
+    // Keep track of where we are in processing content
+    let currentPage = "";
+    let processingAiResponse = false;
+
+    // Format the complete content with user content and AI response
+    let fullContent = userContent;
+
+    if (aiResponse) {
+      fullContent += "\n\n--- AI Feedback ---\n\n" + aiResponse;
+    }
+
+    // Split the full content into paragraphs to preserve structure
+    const paragraphs = fullContent.split("\n");
+    let aiResponseStartIndex = -1;
+
+    // Find where AI response starts
+    for (let i = 0; i < paragraphs.length; i++) {
+      if (paragraphs[i] === "--- AI Feedback ---") {
+        aiResponseStartIndex = i;
+        break;
       }
     }
 
+    // Process paragraphs one by one
+    for (let i = 0; i < paragraphs.length; i++) {
+      // Check if this paragraph starts the AI response
+      if (i === aiResponseStartIndex) {
+        processingAiResponse = true;
+      }
+
+      const paragraph = paragraphs[i];
+      const paragraphWithNewline = paragraph + "\n";
+
+      // Check if adding this paragraph would exceed the page limit
+      if ((currentPage + paragraphWithNewline).length > charsPerPage) {
+        // Current page is full, save it and start a new one
+        pages.push({
+          content: currentPage.trim(),
+          containsAIResponse:
+            processingAiResponse || currentPage.includes("--- AI Feedback ---"),
+          isUserContentEnd: false,
+        });
+
+        // Start new page with this paragraph
+        currentPage = paragraphWithNewline;
+      } else {
+        // Add to current page
+        currentPage += paragraphWithNewline;
+      }
+    }
+
+    // Add the final page if there's content left
     if (currentPage.trim().length > 0) {
-      pages.push(currentPage.trim());
+      pages.push({
+        content: currentPage.trim(),
+        containsAIResponse:
+          processingAiResponse || currentPage.includes("--- AI Feedback ---"),
+        isUserContentEnd: false,
+      });
+    }
+
+    // If no pages were created (empty content), return at least one empty page
+    if (pages.length === 0) {
+      pages.push({
+        content: "",
+        containsAIResponse: false,
+        isUserContentEnd: false,
+      });
     }
 
     return pages;
   };
 
-  useEffect(() => {
-    const fetchDiaries = async () => {
-      try {
-        if (!currentUser || !currentUser._id) {
-          setLoading(false);
-          return;
-        }
-
-        // const response = await axios.get(
-        //   `${import.meta.env.VITE_API_URL}/diary/today`,
-        //   {
-        //     headers: {
-        //       authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        //     },
-        //   }
-        // );
-
-        // Sort diaries by date (newest first)
-        const sortedDiaries = currentUser.diaries.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-
-        // Check if there's an entry for today
-        const todayEntryFound = sortedDiaries.find((diary) =>
-          isToday(diary.createdAt)
-        );
-        setTodayEntry(todayEntryFound);
-
-        setDiaries(sortedDiaries);
+  const fetchDiaries = async () => {
+    try {
+      if (!currentUser || !currentUser._id) {
         setLoading(false);
-      } catch (err) {
-        console.error("Error fetching diaries:", err);
-        setError("Failed to load diary entries");
-        setLoading(false);
+        return;
       }
-    };
 
+      // Sort diaries by date (newest first)
+      const sortedDiaries = currentUser.diaries.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      // Check if there's an entry for today
+      const todayEntryFound = sortedDiaries.find((diary) =>
+        isToday(diary.createdAt)
+      );
+      setTodayEntry(todayEntryFound);
+
+      setDiaries(sortedDiaries);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching diaries:", err);
+      setError("Failed to load diary entries");
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // This will run when the component mounts and when location changes
+    // (i.e., after navigating back from creating/editing an entry)
     fetchDiaries();
-  }, [currentUser]);
+  }, [currentUser, location.pathname]);
 
   const handleCreateOrEdit = () => {
     if (todayEntry) {
@@ -141,11 +190,6 @@ export const DiaryPage = () => {
           >
             {/* Front cover with image */}
             <div className="diary-page cover">
-              {/* <img
-                src={diaryCover} // Path to your front cover image
-                alt="Front Cover"
-                className="cover-image"
-              /> */}
               <div className="cover-content">
                 <h1>{currentUser?.username}'s Journal</h1>
               </div>
@@ -156,9 +200,9 @@ export const DiaryPage = () => {
 
             {/* Diary entries */}
             {diaries.flatMap((diary, diaryIndex) => {
-              const textPages = splitTextIntoPages(diary.content);
+              const contentPages = splitContentIntoPages(diary);
 
-              return textPages.map((pageContent, pageIndex) => (
+              return contentPages.map((pageData, pageIndex) => (
                 <div
                   key={`${diary._id}-page-${pageIndex}`}
                   className="diary-page"
@@ -174,17 +218,30 @@ export const DiaryPage = () => {
                     </div>
                   )}
                   <div className="page-content">
-                    {pageContent}
-                    {pageIndex === textPages.length - 1 &&
-                      diary.ai_response && (
-                        <div className="ai-response">
-                          <h4>AI Feedback:</h4>
-                          <p>{diary.ai_response}</p>
-                        </div>
-                      )}
+                    {/* Apply different styling for content with AI response */}
+                    <div
+                      className={
+                        pageData.containsAIResponse
+                          ? "mixed-content"
+                          : "user-content"
+                      }
+                      dangerouslySetInnerHTML={{
+                        __html: pageData.content
+                          .replace(
+                            /--- AI Feedback ---/g,
+                            '<div class="ai-response-header">AI Feedback:</div>'
+                          )
+                          .replace(/\n/g, "<br>")
+                          // Apply AI response class to text after the AI Feedback header
+                          .replace(
+                            /(<div class="ai-response-header">AI Feedback:<\/div>)(.*)/s,
+                            '$1<div class="ai-response-text">$2</div>'
+                          ),
+                      }}
+                    />
                   </div>
                   <div className="page-number">
-                    {pageIndex + 1}/{textPages.length}
+                    {pageIndex + 1}/{contentPages.length}
                   </div>
                 </div>
               ));
