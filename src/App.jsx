@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import "./App.css";
 import "./css/form.css";
 import { Header } from "./components/Header";
@@ -15,8 +15,12 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { SignupQuestionsPage } from "./pages/SignupQuestionsPage";
 import { ProtectedQuestionRoute } from "./components/ProtectedQuestionRoute";
 import { CreatePlan } from "./components/CreatePlan";
+import { FloatingChatbot } from "./components/FloatingChatbot";
+import { AuthContext } from "./context/AuthContext";
 
 function App() {
+  const { isLoggedIn } = useContext(AuthContext);
+
   return (
     <>
       <Header />
@@ -83,6 +87,9 @@ function App() {
         />
       </Routes>
       <Footer />
+
+      {/* Only show the chatbot for logged-in users */}
+      {isLoggedIn && <FloatingChatbot />}
     </>
   );
 }

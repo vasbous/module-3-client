@@ -1,0 +1,197 @@
+.floating-chatbot-container {
+  position: fixed;
+  bottom: 140px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.chatbot-toggle-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--dark-pink);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: background-color 0.3s, transform 0.2s;
+  position: relative;
+}
+
+.chatbot-toggle-button:hover {
+  background-color: var(--green);
+  transform: scale(1.05);
+}
+
+/* Notification badge styling */
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #ff3b30;
+  color: white;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.chatbot-popup {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  width: 350px;
+  height: 600px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.chatbot-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--dark-pink);
+  padding: 15px;
+}
+
+.chatbot-popup-header h3 {
+  margin: 0;
+  color: white;
+  font-family: "Fredoka", sans-serif;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.chatbot-popup-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Additional style to fix any issues with the Chatbot component */
+.chatbot-popup-content .chatbot-container {
+  box-shadow: none;
+  border-radius: 0;
+  height: 100%;
+}
+
+.chatbot-popup-content .chatbot-header {
+  display: none; /* Hide the original header since we have our own */
+}
+
+/* Animation for popup opening */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation for popup closing */
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+.chatbot-popup {
+  animation: slideIn 0.3s ease-out;
+}
+
+.chatbot-popup.closing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Button entrance animation */
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.chatbot-toggle-button {
+  animation: bounceIn 0.5s;
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 600px) {
+  .chatbot-popup {
+    width: 300px;
+    height: 450px;
+    bottom: 70px;
+  }
+
+  .chatbot-toggle-button {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+}
