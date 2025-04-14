@@ -28,8 +28,8 @@ export const TaskPage = () => {
   const [dailyTasks, setDailyTasks] = useState([]);
   const { currentUser, refetchUser, updateUserPlan } = useContext(AuthContext);
   const { getTasksForDate } = useContext(TaskContext);
-  const minDuration = 3; 
-  const maxDuration = 120; 
+  const minDuration = 3;
+  const maxDuration = 120;
   // tz change time zone, dayjs.tz.guess() find local time zone, .toISOString() : This method converts the adjusted date to ISO 8601 format.
   function localTimezoneIso(date) {
     return date.tz(dayjs.tz.guess()).toISOString();
@@ -45,7 +45,9 @@ export const TaskPage = () => {
 
       if (currentUser?.plan?._id) {
         const tasks = await getTasksForDate(selectedDate);
-        const sorted = tasks.sort((a, b) => dayjs(a.date) - dayjs(b.date));
+        const sorted = tasks.sort(
+          (a, b) => dayjs(a.startDate) - dayjs(b.startDate)
+        );
         setDailyTasks(sorted);
       }
     };
@@ -65,11 +67,10 @@ export const TaskPage = () => {
     setDateTaskDisplay(dateTaskDisplay.add(1, "day"));
   }
 
-
   function checkTaskConflict(newTaskStart, newTaskEnd, existingTasks) {
     // for task in task of the chosen day
     for (let task of existingTasks) {
-      const taskStart = dayjs(task.date); //start date of the task
+      const taskStart = dayjs(task.startDate); //start date of the task
       const taskEnd = dayjs(task.endDate); // end date of the task
 
       //verify the new task dont have conflit with this task
@@ -96,25 +97,24 @@ export const TaskPage = () => {
     setEndDateData(dayjs(event.target.value).add(taskDuration, "minute"));
   };
 
-  
   function handleDurationChange(e) {
     const value = e.target.value;
     // with that the input can be void
-    if (value === '') {
-      setTaskDuration('');
+    if (value === "") {
+      setTaskDuration("");
       return;
     }
     const duration = parseInt(e.target.value, 10);
     if (!isNaN(duration)) {
       // because i dont want to frustrate the user. and after i change it
       if (duration < minDuration) {
-      // put the duration
-      setTaskDuration(duration);
-    } else if (duration > maxDuration) {
-      setTaskDuration(maxDuration);
-    } else {
-      setTaskDuration(duration);
-    }
+        // put the duration
+        setTaskDuration(duration);
+      } else if (duration > maxDuration) {
+        setTaskDuration(maxDuration);
+      } else {
+        setTaskDuration(duration);
+      }
       setEndDateData(dateData.add(duration, "minute"));
     }
   }
@@ -160,7 +160,7 @@ export const TaskPage = () => {
           tasks: [
             {
               task: newTask.data._id,
-              date: taskDate,
+              startDate: taskDate,
               endDate: taskEndDate,
             },
           ],
@@ -174,7 +174,7 @@ export const TaskPage = () => {
       } else {
         const newTaskForPlan = {
           task: newTask.data._id,
-          date: taskDate,
+          startDate: taskDate,
           endDate: taskEndDate,
         };
         const newTasksPlan = [...currentUser.plan.tasks, newTaskForPlan];
@@ -189,7 +189,7 @@ export const TaskPage = () => {
       setTaskData({ content: "" });
       setDateData(dayjs().add(1, "minute"));
       setTaskDuration(30);
-      setEndDateData(dayjs().add(31, "minute"))
+      setEndDateData(dayjs().add(31, "minute"));
     } catch (err) {
       console.log(err);
     }
@@ -237,27 +237,29 @@ export const TaskPage = () => {
                   onChange={handleDateChange}
                 />
               </div>
-             
+
               <div className="input-container input-task">
                 <label htmlFor="duration">Task Duration (minutes)</label>
                 <input
-                 type="text" 
-                 id="duration"
-                 name="duration"
-                 value={taskDuration}
-                 onChange={handleDurationChange}
-                //  after stop focus the input change value
-                 onBlur={() => {
-                   
-                   if (taskDuration === '' || parseInt(taskDuration, 10) < minDuration) {
-                     setTaskDuration(minDuration);
-                   }
-                 }}
-                //  for phone use number keyboard
-                 inputMode="numeric" 
-                //  force number character
-                 pattern="[0-9]*" 
-               />
+                  type="text"
+                  id="duration"
+                  name="duration"
+                  value={taskDuration}
+                  onChange={handleDurationChange}
+                  //  after stop focus the input change value
+                  onBlur={() => {
+                    if (
+                      taskDuration === "" ||
+                      parseInt(taskDuration, 10) < minDuration
+                    ) {
+                      setTaskDuration(minDuration);
+                    }
+                  }}
+                  //  for phone use number keyboard
+                  inputMode="numeric"
+                  //  force number character
+                  pattern="[0-9]*"
+                />
               </div>
               <div className="task-end-info">
                 <p>Task will end at: {endDateData.format("HH:mm")}</p>

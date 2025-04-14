@@ -13,6 +13,7 @@ export const SignUpPage = () => {
 
   const nav = useNavigate();
   const { createUser, errorMessage } = useContext(AuthContext);
+  const { loginUser } = useContext(AuthContext);
 
   const handleChange = (e) => {
     setUserData({
@@ -24,6 +25,7 @@ export const SignUpPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     createUser(userData);
+    loginUser(userData);
   };
 
   return (

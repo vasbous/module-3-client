@@ -8,62 +8,59 @@ import { Link } from "react-router-dom";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import listPlugin from '@fullcalendar/list';
+import listPlugin from "@fullcalendar/list";
 import "../css/calendar.css";
 
 export const DashBoardPage = () => {
-  const { tasksOfTheDay , dailyTasks} = useContext(TaskContext);
-  const { currentUser} = useContext(AuthContext);
-  const [calendarEvents, setCalendarEvents] = useState({})
-  useEffect(()=>{
-    if(currentUser.plan){
-      tasksOfTheDay()
+  const { tasksOfTheDay, dailyTasks } = useContext(TaskContext);
+  const { currentUser } = useContext(AuthContext);
+  const [calendarEvents, setCalendarEvents] = useState({});
+  useEffect(() => {
+    if (currentUser.plan) {
+      tasksOfTheDay();
     }
-    
+
     const events = currentUser?.plan?.tasks?.map((oneTask) => {
-      const date = new Date(oneTask.date);
+      const startDate = new Date(oneTask.startDate);
       const endDate = new Date(oneTask.endDate);
       // const hours = oneTask.time;
       // date.setHours(hours, 0, 0, 0)
+      console.log(oneTask);
       return {
         title: oneTask.task.content,
-        start: date,
+        start: startDate,
         end: endDate,
         id: oneTask._id,
         allDay: false,
         done: oneTask.done,
-        color: oneTask.done ? '#4CAF50' : '#f44336'
-      }
-    })
-    setCalendarEvents(events)
-    
-  }, [currentUser])
- 
- 
+        color: oneTask.done ? "#4CAF50" : "#f44336",
+      };
+    });
+    setCalendarEvents(events);
+  }, [currentUser]);
+
   return (
     <div className="container">
       <div className="calendar-container">
-      <FullCalendar
-      plugins={[ dayGridPlugin , interactionPlugin, listPlugin]}
-      initialView="dayGridWeek"
-      events={calendarEvents||[]}
-       height="100%"
-       eventTimeFormat={{
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false // 24H
-      }}
-      headerToolbar= {{
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridWeek,listWeek' // user can switch between the two
-      }}
-      firstDay={1}
-     
-      
-      
-      // dateClick={(info) => alert(`Tu as cliqué le ${info.dateStr}`)}
-    />
+        <FullCalendar
+          plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
+          initialView="dayGridWeek"
+          events={calendarEvents || []}
+          height="100%"
+          eventTimeFormat={{
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false, // 24H
+          }}
+          headerToolbar={{
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridWeek,listWeek", // user can switch between the two
+          }}
+          firstDay={1}
+
+          // dateClick={(info) => alert(`Tu as cliqué le ${info.dateStr}`)}
+        />
       </div>
       <div className="task-diary-score-container">
         <div className="task-container">

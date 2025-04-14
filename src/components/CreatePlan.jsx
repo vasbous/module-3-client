@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import "../css/CreatePlan.css";
-import { allTasksLibrary } from "../assets/all_tasks_list";
 
 export const CreatePlan = () => {
   const navigate = useNavigate();
@@ -11,26 +10,20 @@ export const CreatePlan = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [previousTasks, setPreviousTasks] = useState([]);
   const [notification, setNotification] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [allGoalTasks, setAllGoalTasks] = useState([]);
 
   useEffect(() => {
-    const fetchInitialData = async () => {
+    const fetchGoalTasks = async () => {
       try {
-        // Check if user has a plan
-        if (currentUser && currentUser.plan) {
-          // Fetch previous tasks
-          const planId = currentUser.plan._id || currentUser.plan;
-          const tasksResponse = await axios.get(
-            `${import.meta.env.VITE_API_URL}/plan/tasks/${planId}`,
-            {
-              headers: {
-                authorization: `Bearer ${localStorage.getItem("authToken")}`,
-              },
-            }
+        if (currentUser && currentUser.goal_details.selectedGoal) {
+          const allTasksLibrary = await axios.get(
+            `${import.meta.env.VITE_API_URL}/task/category/${
+              currentUser.goal_details.selectedGoal
+            }`
           );
-          setPreviousTasks(tasksResponse.data || []);
+          setAllGoalTasks(allTasksLibrary.data);
         }
         setLoading(false);
       } catch (err) {
@@ -40,10 +33,10 @@ export const CreatePlan = () => {
       }
     };
 
-    fetchInitialData();
+    fetchGoalTasks();
   }, [currentUser]);
 
-  const allTasksLibraryString = JSON.stringify(allTasksLibrary, null, 2);
+  const allTasksLibraryString = JSON.stringify(allGoalTasks, null, 2);
 
   const generateGeminiPrompt = () => {
     // Extract goal details from user
@@ -63,23 +56,6 @@ export const CreatePlan = () => {
         .join("\n");
     }
 
-    // Format previous tasks
-    const lastTasks = previousTasks
-      .slice(0, 10)
-      .map(
-        (task) =>
-          `Title: ${task.task.content}\nCategory: ${
-            task.task.category
-          }\nDifficulty: ${task.task.difficulty_level}\nDuration: ${
-            task.task.duration
-          } minutes\nDate: ${new Date(
-            task.date
-          ).toLocaleDateString()}\nTime: ${new Date(
-            task.date
-          ).toLocaleTimeString()}\nCompleted: ${task.done ? "Yes" : "No"}`
-      )
-      .join("\n\n---\n\n");
-
     // Get current date and calculate one month from now
     const startDate = new Date();
     const endDate = new Date();
@@ -92,9 +68,6 @@ User Goal: ${selectedGoal}
 
 Relevant Questions & User's Answers:
 ${questionsAndAnswers || "No specific questions answered yet"}
-
-Last 10 Tasks (if available):
-${lastTasks || "No previous tasks available"}
 
 IMPORTANT: Instead of creating new tasks, you MUST select tasks ONLY from the provided task library below:
 ${allTasksLibraryString}
@@ -110,13 +83,9 @@ Your response should be in valid JSON format with the following structure:
   },
   "tasks": [
     {
-      "content": "Task title",
-      "description": "Detailed task description",
-      "category": "Category ('Lose weight', 'Get fitter', 'Less stress', 'Get happier', 'Stop procrastinating', 'Be more productive')",
-      "duration": minutes (integer),
-      "date": YYYY-MM-DD
-      "startTime": HH:MM
-      "endTime": HH:MM
+      "task":ObjectId(id)
+      "startDate": YYYY-MM-DDTHH:mm,
+      "endDate": YYYY-MM-DDTHH:mm,
     },
     // More tasks...
   ]
@@ -125,10 +94,10 @@ Your response should be in valid JSON format with the following structure:
 Guidelines:
 1. Using the  1-3 tasks per day spread over the next month according to user answer about available days of the week.
 2. Ensure tasks are specific, actionable, and directly related to the user's goal
-3. Try not to repeat the same tasks if more options are available or at least not repeat them too close together.
-4. If you schedule an easy or quick task (like drink a glass of water), also assign another task on that day.
-5. Schedule tasks at times that align with the user's preferences from their answers
-6. Ensure task durations are reasonable (5-90 minutes)
+3. Do not repeat the same tasks if more options are available or at least don't repeat them too close together.
+4. If you schedule an easy or quick task, also assign another task on that day.
+5. Schedule tasks at times that align with the user's preferences from their answers, as well as enough tasks to cover the user's available time.
+6. Ensure each task's duration is reasonable (5-90 minutes).
 7. Avoid scheduling tasks too close together on the same day
 8. Your response MUST be valid JSON only, with no additional text or explanations
 9. YOU MUST ONLY SELECT TASKS FROM THE PROVIDED LIBRARY - do not create new tasks
@@ -184,6 +153,13 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
 
       // Parse the JSON response
       console.log("Attempting to parse JSON response...");
+
+      aiResponse = aiResponse
+        .trim()
+        .replace(/^```json\s*/i, "")
+        .replace(/```$/, "")
+        .trim();
+
       const planData = JSON.parse(aiResponse);
       console.log("Successfully parsed plan data:", planData);
       return planData;
@@ -209,60 +185,32 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
       // Get AI generated plan
       const planData = await getAIPlan();
 
-      // First create plan
+      // First create the plan with start and end dates
       const planResponse = await axios.post(
         `${import.meta.env.VITE_API_URL}/plan`,
         planData.plan,
         {
           headers: {
-            authorization: `Bearer ${localStorage.getItem("authToken")}`,
             "Content-Type": "application/json",
           },
         }
       );
 
       const createdPlan = planResponse.data;
+      console.log("Created plan:", createdPlan);
 
-      // Create tasks and add them to the plan
-      const createdTasks = [];
-      const taskPromises = planData.tasks.map(async (taskData) => {
-        // Extract the date and time
-        const taskDate = new Date(taskData.date);
-        taskDate.setHours(taskData.time, 0, 0, 0);
-
-        // First create the task
-        const taskResponse = await axios.post(
-          `${import.meta.env.VITE_API_URL}/task`,
-          {
-            content: taskData.content,
-            category: taskData.category,
-            difficulty_level: taskData.difficulty_level,
-            duration: taskData.duration,
-            description: taskData.description,
-            plan_task: true,
-          },
-          {
-            headers: {
-              authorization: `Bearer ${localStorage.getItem("authToken")}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        createdTasks.push({
-          task: taskResponse.data._id,
-          date: taskDate,
-          time: taskData.time,
-          done: false,
-        });
-      });
-
-      await Promise.all(taskPromises);
+      // Format tasks with task IDs, startDate, endDate, and done status
+      const formattedTasks = planData.tasks.map((task) => ({
+        task: task.task, // This should already be the ObjectId of the task
+        startDate: new Date(task.startDate),
+        endDate: new Date(task.endDate),
+        done: false,
+      }));
 
       // Update the plan with the tasks
       await axios.patch(
         `${import.meta.env.VITE_API_URL}/plan/${createdPlan._id}`,
-        { tasks: createdTasks },
+        { tasks: formattedTasks },
         {
           headers: {
             authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -289,10 +237,10 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
       // Show success notification
       setNotification("Your plan has been successfully created!");
 
-      //   // Navigate after a delay to let user see the notification
-      //   setTimeout(() => {
-      //     navigate("/plan");
-      //   }, 2000);
+      // Navigate after a delay to let user see the notification
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
     } catch (err) {
       console.error("Error creating plan:", err);
       setError(err.message || "Failed to create your plan. Please try again.");

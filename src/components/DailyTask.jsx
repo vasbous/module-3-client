@@ -1,13 +1,12 @@
 import { useContext } from "react";
 import { TaskContext } from "../context/TaskContext";
-import dayjs from "dayjs"; 
+import dayjs from "dayjs";
 
 export const DailyTask = ({ dailyTasks }) => {
   const { doneTask, deleteUserTask } = useContext(TaskContext);
 
-  
   function formatLocalTime(data) {
-    return dayjs(data).format("HH:mm"); 
+    return dayjs(data).format("HH:mm");
   }
 
   return (
@@ -27,7 +26,8 @@ export const DailyTask = ({ dailyTasks }) => {
           </div>
           <div className="content-task">{oneTask.task.content}</div>
           <div className="time-task">
-            {formatLocalTime(oneTask.date)} - {formatLocalTime(oneTask.endDate)}
+            {formatLocalTime(oneTask.startDate)} -
+            {formatLocalTime(oneTask.endDate)}
           </div>
           {!oneTask.task.plan_task && (
             <i

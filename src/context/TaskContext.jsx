@@ -11,16 +11,16 @@ const TaskContextWrapper = ({ children }) => {
 
   //   toggle check task
   async function doneTask(taskToUpdate) {
-     if(dayjs(taskToUpdate.date).isBefore(dayjs(), 'day')){
-        alert("can't done previous day tasks");
-        return; // stop the submit
-      }
+    if (dayjs(taskToUpdate.startDate).isBefore(dayjs(), "day")) {
+      alert("can't done previous day tasks");
+      return; // stop the submit
+    }
     try {
       const updatedTasks = currentUser.plan.tasks.map((task) => {
         if (
           task.task._id === taskToUpdate.task._id &&
-          new Date(task.date).toISOString() ===
-            new Date(taskToUpdate.date).toISOString()
+          new Date(task.startDate).toISOString() ===
+            new Date(taskToUpdate.startDate).toISOString()
         ) {
           return { ...task, done: !task.done }; // toggle done status
         }
@@ -49,8 +49,8 @@ const TaskContextWrapper = ({ children }) => {
           (oneTask) =>
             !(
               oneTask.task._id === taskToDelete.task._id &&
-              new Date(oneTask.date).toISOString() ===
-                new Date(taskToDelete.date).toISOString()
+              new Date(oneTask.startDate).toISOString() ===
+                new Date(taskToDelete.startDate).toISOString()
             )
         );
 
@@ -75,16 +75,18 @@ const TaskContextWrapper = ({ children }) => {
   }
   async function getTasksForDate(date) {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/plan/tasks/${currentUser.plan._id}?date=${date}`,
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/plan/tasks/${
+          currentUser.plan._id
+        }?date=${date}`,
         {
           headers: {
             authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         }
       );
-      // console.log("taks for the date", date, response.data); // 
-      return response.data; 
-
+      // console.log("taks for the date", date, response.data); //
+      return response.data;
     } catch (error) {
       console.error("task date error", error);
       return [];
@@ -92,7 +94,6 @@ const TaskContextWrapper = ({ children }) => {
   }
 
   async function tasksOfTheDay() {
-    
     try {
       const tasks = await axios.get(
         `${import.meta.env.VITE_API_URL}/plan/tasks/${currentUser.plan._id}`,
@@ -110,7 +111,13 @@ const TaskContextWrapper = ({ children }) => {
 
   return (
     <TaskContext.Provider
-      value={{ doneTask, deleteUserTask, tasksOfTheDay, dailyTasks ,getTasksForDate}}
+      value={{
+        doneTask,
+        deleteUserTask,
+        tasksOfTheDay,
+        dailyTasks,
+        getTasksForDate,
+      }}
     >
       {children}
     </TaskContext.Provider>

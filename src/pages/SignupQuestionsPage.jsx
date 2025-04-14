@@ -66,7 +66,7 @@ export const SignupQuestionsPage = () => {
               setCurrentQuestionIndex(nextUnansweredIndex);
             } else {
               // All questions answered, go to dashboard
-              navigate("/dashboard");
+              navigate("/create-plan");
             }
 
             // Restore saved answers
@@ -266,7 +266,7 @@ export const SignupQuestionsPage = () => {
     if (currentQuestionIndex >= questions.length - 1) {
       // Complete the signup process
       await completeSignup();
-      navigate("/dashboard");
+      navigate("/create-plan");
     } else {
       // Move to next question
       setCurrentQuestionIndex(currentQuestionIndex + 1);
