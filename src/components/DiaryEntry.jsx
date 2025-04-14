@@ -65,7 +65,7 @@ export const DiaryEntry = () => {
   const generateGeminiPrompt = () => {
     // Extract goal details from user
     const goalDetails = currentUser.goal_details || {};
-    const activeGoal = goalDetails.name || "No specific goal set";
+    const selectedGoal = goalDetails.selectedGoal || "No specific goal set";
 
     // Format goal-related questions and answers
     let questionsAndAnswers = "";
@@ -74,7 +74,7 @@ export const DiaryEntry = () => {
         .map(
           (q) =>
             `Question: ${q.question || q.title}\nAnswer: ${
-              q.answer || "Not answered"
+              q.user_answer || "Not answered"
             }`
         )
         .join("\n");
@@ -92,11 +92,11 @@ export const DiaryEntry = () => {
       .join("\n\n---\n\n");
 
     return `
-You are a compassionate life coach providing supportive feedback on a user's journal entry. Below, you'll find the following information:
+You are a compassionate life coach providing feedback on a user's journal entry. Below, you'll find the following information:
 
 Current Journal Entry: ${content}
 Mood Rating: ${moodScore}/10
-Active Goal: ${activeGoal}
+User Goal: ${selectedGoal}
 Relevant Questions & User's Answers: 
 ${questionsAndAnswers || "No specific questions answered yet"}
 
@@ -109,6 +109,7 @@ What Went Well Today: Identify and highlight any positive aspects or progress fr
 Suggestion for Tomorrow: Offer a kind, practical suggestion to help the user continue progressing towards their goal.
 
 Keep the tone positive, human, and encouraging. Your feedback should be warm and supportive, aiming to empower the user while validating their experiences.
+Don't start with any preamble. Just provide the feedback in the three sections.
 `;
   };
 
@@ -116,7 +117,7 @@ Keep the tone positive, human, and encouraging. Your feedback should be warm and
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       const prompt = generateGeminiPrompt();
-
+      console.log(prompt);
       const response = await axios.post(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
         {
@@ -169,7 +170,7 @@ Keep the tone positive, human, and encouraging. Your feedback should be warm and
     try {
       // Get AI feedback for this entry
       const aiResponse = await getAIFeedback();
-
+      console.log(aiResponse);
       const diaryData = {
         content,
         mood_score: moodScore,

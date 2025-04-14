@@ -26,7 +26,7 @@
 /* Page styling */
 .diary-page {
   background-color: #fff9f0;
-  padding: 40px;
+  padding: 40px 40px 60px 40px; /* Increased bottom padding for page number */
   border-radius: 0 5px 5px 0;
   background-size: 23px 23px;
   background-position: 0 4px;
@@ -102,8 +102,8 @@
 .page-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 30px;
-  padding-bottom: 10px;
+  margin-bottom: 15px; /* Reduced from 30px */
+  padding-bottom: 5px; /* Reduced from 10px */
   border-bottom: 1px solid #ddd;
   font-family: "Caveat", cursive;
   font-size: 1.2rem;
@@ -115,53 +115,67 @@
 }
 
 .page-content {
-  font-family: "Kalam", cursive;
   font-size: 1.1rem;
-  line-height: 1.6;
+  line-height: 1.5; /* Slightly tighter line height */
   color: #333;
-  height: calc(100% - 100px);
-  overflow: hidden;
+  height: calc(100% - 40px); /* Adjusted to fill more space */
+  overflow: visible;
+  position: relative;
 }
 
+/* Ensure content flows correctly across pages */
+.page-content div:first-child {
+  margin-top: 0;
+}
+
+.page-content div:last-child {
+  margin-bottom: 0;
+}
+
+/* IMPORTANT - Font styling for different content types */
 .user-content {
-  font-family: "Kalam", cursive;
+  font-family: "Kalam", cursive !important;
   font-size: 1.1rem;
-  line-height: 1.6;
-  color: #333;
-}
-
-.mixed-content {
-  font-family: "Kalam", cursive;
-  font-size: 1.1rem;
-  line-height: 1.6;
+  line-height: 1.5;
   color: #333;
 }
 
 .ai-response-header {
-  font-family: "Caveat", cursive;
+  font-family: "Caveat", cursive !important;
   font-size: 1.3rem;
   color: var(--dark-pink);
   font-weight: bold;
-  margin-top: 20px;
+  margin-top: 10px;
   margin-bottom: 5px;
+  padding-top: 5px;
+  border-top: 1px dashed #ddd;
 }
 
 .ai-response-text {
-  font-family: "Quicksand", sans-serif;
+  font-family: "Quicksand", sans-serif !important;
   font-size: 1rem;
-  line-height: 1.5;
+  line-height: 1.4;
   color: #555;
   font-style: italic;
 }
 
-/* Add spacing between user content and AI response */
-.mixed-content br + .ai-response-header {
-  margin-top: 15px;
+/* Fix for continuation pages */
+.ai-response-text:first-child {
+  margin-top: 5px;
 }
 
+/* Prevent visual jumping between pages */
+.user-content,
+.ai-response-text {
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+/* Page number */
 .page-number {
   position: absolute;
-  bottom: 20px;
+  bottom: 15px;
   right: 20px;
   font-family: "Caveat", cursive;
   font-size: 0.9rem;
@@ -221,6 +235,11 @@
   border: 1px solid var(--green);
 }
 
+/* Ensure first page content starts after header */
+.page-header + .page-content {
+  padding-top: 5px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .diary-book-container {
@@ -228,7 +247,7 @@
   }
 
   .diary-page {
-    padding: 25px;
+    padding: 25px 25px 45px 25px;
   }
 
   .page-content {
@@ -246,7 +265,7 @@
   }
 
   .diary-page {
-    padding: 20px;
+    padding: 20px 20px 40px 20px;
   }
 
   .page-content {

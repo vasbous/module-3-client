@@ -14,6 +14,17 @@ export const DiaryPage = () => {
   const location = useLocation();
   const flipBookRef = useRef();
 
+  useEffect(() => {
+    fetchDiaries();
+
+    if (diaries.length > 0 && flipBookRef.current) {
+      const timer = setTimeout(() => {
+        flipBookRef.current.pageFlip().flipNext();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [currentUser, location.pathname, diaries.length]);
+
   // Function to format date as DD/MM/YYYY
   const formatDate = (date) => {
     const d = new Date(date);
@@ -34,82 +45,162 @@ export const DiaryPage = () => {
     );
   };
 
-  // Improved split content function that keeps AI response with user content when possible
-  const splitContentIntoPages = (diary, charsPerPage = 900) => {
+  // Get page height estimate in characters for current page size
+  const getEstimatedPageHeight = () => {
+    // A rough estimate based on average font size and page dimensions
+    // This can be adjusted based on actual content density
+    return 800; // Characters per page (equivalent to approx. 15-18 lines)
+  };
+
+  // Improved content splitting that maintains content integrity
+  const splitContentIntoPages = (diary) => {
     if (!diary) return [];
 
-    const pages = [];
     const userContent = diary.content || "";
     const aiResponse = diary.ai_response || "";
+    const charsPerPage = getEstimatedPageHeight();
+    const pages = [];
 
-    // Keep track of where we are in processing content
-    let currentPage = "";
-    let processingAiResponse = false;
+    // Process user content first
+    let remainingUserContent = userContent;
+    let firstPage = true;
 
-    // Format the complete content with user content and AI response
-    let fullContent = userContent;
+    // Create pages for user content
+    while (remainingUserContent.length > 0) {
+      let currentPageContent = "";
 
-    if (aiResponse) {
-      fullContent += "\n\n--- AI Feedback ---\n\n" + aiResponse;
-    }
-
-    // Split the full content into paragraphs to preserve structure
-    const paragraphs = fullContent.split("\n");
-    let aiResponseStartIndex = -1;
-
-    // Find where AI response starts
-    for (let i = 0; i < paragraphs.length; i++) {
-      if (paragraphs[i] === "--- AI Feedback ---") {
-        aiResponseStartIndex = i;
-        break;
-      }
-    }
-
-    // Process paragraphs one by one
-    for (let i = 0; i < paragraphs.length; i++) {
-      // Check if this paragraph starts the AI response
-      if (i === aiResponseStartIndex) {
-        processingAiResponse = true;
-      }
-
-      const paragraph = paragraphs[i];
-      const paragraphWithNewline = paragraph + "\n";
-
-      // Check if adding this paragraph would exceed the page limit
-      if ((currentPage + paragraphWithNewline).length > charsPerPage) {
-        // Current page is full, save it and start a new one
-        pages.push({
-          content: currentPage.trim(),
-          containsAIResponse:
-            processingAiResponse || currentPage.includes("--- AI Feedback ---"),
-          isUserContentEnd: false,
-        });
-
-        // Start new page with this paragraph
-        currentPage = paragraphWithNewline;
+      if (firstPage) {
+        // If first page, we leave space for the header
+        const effectiveCharsPerPage = charsPerPage - 100; // Approximate header space
+        currentPageContent = remainingUserContent.substring(
+          0,
+          effectiveCharsPerPage
+        );
+        remainingUserContent = remainingUserContent.substring(
+          effectiveCharsPerPage
+        );
+        firstPage = false;
       } else {
-        // Add to current page
-        currentPage += paragraphWithNewline;
+        // For subsequent pages, use full page
+        currentPageContent = remainingUserContent.substring(0, charsPerPage);
+        remainingUserContent = remainingUserContent.substring(charsPerPage);
       }
+
+      // Wrap with appropriate styling
+      pages.push(
+        `<div class="user-content">${currentPageContent.replace(
+          /\n/g,
+          "<br>"
+        )}</div>`
+      );
     }
 
-    // Add the final page if there's content left
-    if (currentPage.trim().length > 0) {
-      pages.push({
-        content: currentPage.trim(),
-        containsAIResponse:
-          processingAiResponse || currentPage.includes("--- AI Feedback ---"),
-        isUserContentEnd: false,
-      });
-    }
+    // If there's no AI response, we're done
+    if (!aiResponse) return pages.length > 0 ? pages : [""];
 
-    // If no pages were created (empty content), return at least one empty page
-    if (pages.length === 0) {
-      pages.push({
-        content: "",
-        containsAIResponse: false,
-        isUserContentEnd: false,
-      });
+    // If we have AI response, process it
+
+    // If the last page of user content has enough space, add AI header there
+    const lastUserPageEstimatedLength = pages[pages.length - 1].length;
+
+    if (lastUserPageEstimatedLength < charsPerPage * 0.75) {
+      // There's room for the AI header on the last user content page
+      // Update the last page to include the AI header
+      pages[
+        pages.length - 1
+      ] += `<div class="ai-response-header">AI Feedback:</div>`;
+
+      // Check if there's still room for some AI content
+      const remainingSpace = charsPerPage - lastUserPageEstimatedLength - 50; // 50 chars for header
+
+      if (remainingSpace > 200 && aiResponse.length > 0) {
+        // If there's meaningful space left (at least ~4 lines) and we have AI content
+        const firstPartAI = aiResponse.substring(0, remainingSpace);
+        const restAI = aiResponse.substring(remainingSpace);
+
+        // Add first part of AI response to current page
+        pages[
+          pages.length - 1
+        ] += `<div class="ai-response-text">${firstPartAI.replace(
+          /\n/g,
+          "<br>"
+        )}</div>`;
+
+        // Process rest of AI response on new pages if needed
+        let remainingAIContent = restAI;
+
+        while (remainingAIContent.length > 0) {
+          const currentPageContent = remainingAIContent.substring(
+            0,
+            charsPerPage
+          );
+          remainingAIContent = remainingAIContent.substring(charsPerPage);
+
+          pages.push(
+            `<div class="ai-response-text">${currentPageContent.replace(
+              /\n/g,
+              "<br>"
+            )}</div>`
+          );
+        }
+      } else {
+        // Not enough meaningful space left, put all AI content on next page
+        let remainingAIContent = aiResponse;
+
+        while (remainingAIContent.length > 0) {
+          const currentPageContent = remainingAIContent.substring(
+            0,
+            charsPerPage
+          );
+          remainingAIContent = remainingAIContent.substring(charsPerPage);
+
+          // Add AI content to new page
+          if (remainingAIContent === aiResponse) {
+            // First AI page needs no header (it's on previous page)
+            pages.push(
+              `<div class="ai-response-text">${currentPageContent.replace(
+                /\n/g,
+                "<br>"
+              )}</div>`
+            );
+          } else {
+            // Continuation of AI content
+            pages.push(
+              `<div class="ai-response-text">${currentPageContent.replace(
+                /\n/g,
+                "<br>"
+              )}</div>`
+            );
+          }
+        }
+      }
+    } else {
+      // Last user page is too full, create new page for AI content
+      pages.push(
+        `<div class="ai-response-header">AI Feedback:</div><div class="ai-response-text">${aiResponse
+          .substring(0, charsPerPage - 50)
+          .replace(/\n/g, "<br>")}</div>`
+      );
+
+      // If AI content is longer than one page, continue to more pages
+      if (aiResponse.length > charsPerPage - 50) {
+        let remainingAIContent = aiResponse.substring(charsPerPage - 50);
+
+        while (remainingAIContent.length > 0) {
+          const currentPageContent = remainingAIContent.substring(
+            0,
+            charsPerPage
+          );
+          remainingAIContent = remainingAIContent.substring(charsPerPage);
+
+          pages.push(
+            `<div class="ai-response-text">${currentPageContent.replace(
+              /\n/g,
+              "<br>"
+            )}</div>`
+          );
+        }
+      }
     }
 
     return pages;
@@ -143,22 +234,17 @@ export const DiaryPage = () => {
   };
 
   useEffect(() => {
-    // This will run when the component mounts and when location changes
-    // (i.e., after navigating back from creating/editing an entry)
     fetchDiaries();
   }, [currentUser, location.pathname]);
 
   const handleCreateOrEdit = () => {
     if (todayEntry) {
-      // Navigate to edit today's entry
       navigate(`/diary/edit/${todayEntry._id}`);
     } else {
-      // Navigate to create new entry
       navigate("/diary/create");
     }
   };
 
-  // Go back to dashboard
   const handleBackToDashboard = () => {
     navigate("/dashboard");
   };
@@ -202,7 +288,7 @@ export const DiaryPage = () => {
             {diaries.flatMap((diary, diaryIndex) => {
               const contentPages = splitContentIntoPages(diary);
 
-              return contentPages.map((pageData, pageIndex) => (
+              return contentPages.map((pageContent, pageIndex) => (
                 <div
                   key={`${diary._id}-page-${pageIndex}`}
                   className="diary-page"
@@ -218,25 +304,9 @@ export const DiaryPage = () => {
                     </div>
                   )}
                   <div className="page-content">
-                    {/* Apply different styling for content with AI response */}
                     <div
-                      className={
-                        pageData.containsAIResponse
-                          ? "mixed-content"
-                          : "user-content"
-                      }
                       dangerouslySetInnerHTML={{
-                        __html: pageData.content
-                          .replace(
-                            /--- AI Feedback ---/g,
-                            '<div class="ai-response-header">AI Feedback:</div>'
-                          )
-                          .replace(/\n/g, "<br>")
-                          // Apply AI response class to text after the AI Feedback header
-                          .replace(
-                            /(<div class="ai-response-header">AI Feedback:<\/div>)(.*)/s,
-                            '$1<div class="ai-response-text">$2</div>'
-                          ),
+                        __html: pageContent,
                       }}
                     />
                   </div>
