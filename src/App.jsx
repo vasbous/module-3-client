@@ -85,6 +85,15 @@ function App() {
             </ProtectedQuestionRoute>
           }
         />
+
+        <Route
+          path="/plan"
+          element={
+            <ProtectedQuestionRoute>
+              <CreatePlan />
+            </ProtectedQuestionRoute>
+          }
+        />
       </Routes>
       <Footer />
 

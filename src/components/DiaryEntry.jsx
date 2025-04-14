@@ -231,7 +231,7 @@ Don't start with any preamble. Just provide the feedback in the three sections.
 
       refetchUser(currentUser._id);
       // Navigate back to diary page
-      navigate("/diary");
+      navigate("/diary", { state: { refreshDiary: true } });
     } catch (err) {
       console.error("Error saving diary entry:", err);
       setError("Failed to save your diary entry. Please try again.");

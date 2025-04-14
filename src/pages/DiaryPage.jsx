@@ -10,20 +10,26 @@ export const DiaryPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [todayEntry, setTodayEntry] = useState(null);
+  const [hasAutoFlipped, setHasAutoFlipped] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const flipBookRef = useRef();
 
   useEffect(() => {
     fetchDiaries();
+  }, [currentUser, location.pathname]);
 
-    if (diaries.length > 0 && flipBookRef.current) {
+  // Separate useEffect just for the auto-flip functionality
+  useEffect(() => {
+    // Only do the auto-flip once when page loads, and only if we have diaries and a flipbook reference
+    if (diaries.length > 0 && flipBookRef.current && !hasAutoFlipped) {
       const timer = setTimeout(() => {
         flipBookRef.current.pageFlip().flipNext();
+        setHasAutoFlipped(true); // Mark that we've done the auto-flip
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [currentUser, location.pathname, diaries.length]);
+  }, [diaries.length, hasAutoFlipped]);
 
   // Function to format date as DD/MM/YYYY
   const formatDate = (date) => {
@@ -52,7 +58,35 @@ export const DiaryPage = () => {
     return 800; // Characters per page (equivalent to approx. 15-18 lines)
   };
 
-  // Improved content splitting that maintains content integrity
+  // Helper function to cut text at word boundaries
+  const cutAtWordBoundary = (text, maxLength) => {
+    if (text.length <= maxLength) return { cut: text, remaining: "" };
+
+    // Find the last space within the maxLength limit
+    let lastSpaceIndex = text.substring(0, maxLength).lastIndexOf(" ");
+
+    // If no space found or too close to the beginning, cut at maxLength
+    if (lastSpaceIndex <= 0 || lastSpaceIndex < maxLength * 0.5) {
+      // If we're cutting in the middle of a word and near maxLength,
+      // find the next space after maxLength
+      const nextSpaceIndex = text.indexOf(" ", maxLength);
+
+      // If next space is too far away, just cut at maxLength
+      if (nextSpaceIndex === -1 || nextSpaceIndex > maxLength + 50) {
+        lastSpaceIndex = maxLength;
+      } else {
+        // Otherwise cut at the next space
+        lastSpaceIndex = nextSpaceIndex;
+      }
+    }
+
+    return {
+      cut: text.substring(0, lastSpaceIndex),
+      remaining: text.substring(lastSpaceIndex + 1), // +1 to skip the space
+    };
+  };
+
+  // Improved content splitting that maintains content integrity and word boundaries
   const splitContentIntoPages = (diary) => {
     if (!diary) return [];
 
@@ -72,18 +106,21 @@ export const DiaryPage = () => {
       if (firstPage) {
         // If first page, we leave space for the header
         const effectiveCharsPerPage = charsPerPage - 100; // Approximate header space
-        currentPageContent = remainingUserContent.substring(
-          0,
+        const { cut, remaining } = cutAtWordBoundary(
+          remainingUserContent,
           effectiveCharsPerPage
         );
-        remainingUserContent = remainingUserContent.substring(
-          effectiveCharsPerPage
-        );
+        currentPageContent = cut;
+        remainingUserContent = remaining;
         firstPage = false;
       } else {
         // For subsequent pages, use full page
-        currentPageContent = remainingUserContent.substring(0, charsPerPage);
-        remainingUserContent = remainingUserContent.substring(charsPerPage);
+        const { cut, remaining } = cutAtWordBoundary(
+          remainingUserContent,
+          charsPerPage
+        );
+        currentPageContent = cut;
+        remainingUserContent = remaining;
       }
 
       // Wrap with appropriate styling
@@ -115,32 +152,29 @@ export const DiaryPage = () => {
 
       if (remainingSpace > 200 && aiResponse.length > 0) {
         // If there's meaningful space left (at least ~4 lines) and we have AI content
-        const firstPartAI = aiResponse.substring(0, remainingSpace);
-        const restAI = aiResponse.substring(remainingSpace);
+        const { cut, remaining } = cutAtWordBoundary(
+          aiResponse,
+          remainingSpace
+        );
 
         // Add first part of AI response to current page
-        pages[
-          pages.length - 1
-        ] += `<div class="ai-response-text">${firstPartAI.replace(
+        pages[pages.length - 1] += `<div class="ai-response-text">${cut.replace(
           /\n/g,
           "<br>"
         )}</div>`;
 
         // Process rest of AI response on new pages if needed
-        let remainingAIContent = restAI;
+        let remainingAIContent = remaining;
 
         while (remainingAIContent.length > 0) {
-          const currentPageContent = remainingAIContent.substring(
-            0,
+          const { cut, remaining } = cutAtWordBoundary(
+            remainingAIContent,
             charsPerPage
           );
-          remainingAIContent = remainingAIContent.substring(charsPerPage);
+          remainingAIContent = remaining;
 
           pages.push(
-            `<div class="ai-response-text">${currentPageContent.replace(
-              /\n/g,
-              "<br>"
-            )}</div>`
+            `<div class="ai-response-text">${cut.replace(/\n/g, "<br>")}</div>`
           );
         }
       } else {
@@ -148,17 +182,17 @@ export const DiaryPage = () => {
         let remainingAIContent = aiResponse;
 
         while (remainingAIContent.length > 0) {
-          const currentPageContent = remainingAIContent.substring(
-            0,
+          const { cut, remaining } = cutAtWordBoundary(
+            remainingAIContent,
             charsPerPage
           );
-          remainingAIContent = remainingAIContent.substring(charsPerPage);
+          remainingAIContent = remaining;
 
           // Add AI content to new page
           if (remainingAIContent === aiResponse) {
             // First AI page needs no header (it's on previous page)
             pages.push(
-              `<div class="ai-response-text">${currentPageContent.replace(
+              `<div class="ai-response-text">${cut.replace(
                 /\n/g,
                 "<br>"
               )}</div>`
@@ -166,7 +200,7 @@ export const DiaryPage = () => {
           } else {
             // Continuation of AI content
             pages.push(
-              `<div class="ai-response-text">${currentPageContent.replace(
+              `<div class="ai-response-text">${cut.replace(
                 /\n/g,
                 "<br>"
               )}</div>`
@@ -176,30 +210,31 @@ export const DiaryPage = () => {
       }
     } else {
       // Last user page is too full, create new page for AI content
+      const { cut, remaining } = cutAtWordBoundary(
+        aiResponse,
+        charsPerPage - 50
+      );
+
       pages.push(
-        `<div class="ai-response-header">AI Feedback:</div><div class="ai-response-text">${aiResponse
-          .substring(0, charsPerPage - 50)
-          .replace(/\n/g, "<br>")}</div>`
+        `<div class="ai-response-header">AI Feedback:</div><div class="ai-response-text">${cut.replace(
+          /\n/g,
+          "<br>"
+        )}</div>`
       );
 
       // If AI content is longer than one page, continue to more pages
-      if (aiResponse.length > charsPerPage - 50) {
-        let remainingAIContent = aiResponse.substring(charsPerPage - 50);
+      let remainingAIContent = remaining;
 
-        while (remainingAIContent.length > 0) {
-          const currentPageContent = remainingAIContent.substring(
-            0,
-            charsPerPage
-          );
-          remainingAIContent = remainingAIContent.substring(charsPerPage);
+      while (remainingAIContent.length > 0) {
+        const { cut, remaining } = cutAtWordBoundary(
+          remainingAIContent,
+          charsPerPage
+        );
+        remainingAIContent = remaining;
 
-          pages.push(
-            `<div class="ai-response-text">${currentPageContent.replace(
-              /\n/g,
-              "<br>"
-            )}</div>`
-          );
-        }
+        pages.push(
+          `<div class="ai-response-text">${cut.replace(/\n/g, "<br>")}</div>`
+        );
       }
     }
 
@@ -232,10 +267,6 @@ export const DiaryPage = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchDiaries();
-  }, [currentUser, location.pathname]);
 
   const handleCreateOrEdit = () => {
     if (todayEntry) {
