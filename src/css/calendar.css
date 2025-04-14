@@ -1,0 +1,31 @@
+
+.calendar-container{
+    padding: 10px;
+    
+}
+.fc .fc-button-primary{
+    background: var(--green);
+}
+.fc .fc-button-primary:not(:disabled).fc-button-active, .fc .fc-button-primary:not(:disabled):active{
+    background: var(--dark-pink);
+}
+
+.fc .fc-toolbar-title{
+    font-family: "Fredoka", sans-serif;
+    color: var(--dark-pink);
+}
+.fc ,.fc-daygrid-day-number, .fc-event{
+    font-family: "Nunito", sans-serif;
+    
+  }
+
+  th.fc-day{
+    background: var(--green);
+    color: white;
+  }
+  th.fc-day-today{
+    background: var(--dark-pink);
+  }
+  .fc .fc-daygrid-day.fc-day-today{
+    background-color: var(--pink);
+  }

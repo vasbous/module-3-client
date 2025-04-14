@@ -181,8 +181,9 @@ footer {
   text-align: center;
 }
 .content-task {
-  width: 35vw;
+  width: 62%;
 }
+
 .oneTask i {
   margin: 0 auto;
   color: red;
@@ -467,4 +468,5 @@ a {
   .goals-grid {
     grid-template-columns: 1fr;
   }
+
 }
