@@ -23,12 +23,12 @@ export const DashBoardPage = () => {
       tasksOfTheDay();
     }
 
-    const events = currentUser?.plan?.tasks?.map((oneTask) => {
+    const events = currentUser?.plan?.tasks?.map((oneTask , key) => {
       const startDate = new Date(oneTask.startDate);
       const endDate = new Date(oneTask.endDate);
       // const hours = oneTask.time;
       // date.setHours(hours, 0, 0, 0)
-      console.log(oneTask.task.description);
+      // console.log(oneTask)
       return {
         title: oneTask.task.content,
         start: startDate,
@@ -37,13 +37,15 @@ export const DashBoardPage = () => {
         allDay: false,
         done: oneTask.done,
         color: oneTask.done ? "#4CAF50" : "#f44336",
-        details: oneTask.task.description
+        details: oneTask.task.description,
+        taskId: oneTask.task._id
+        
       };
     });
     setCalendarEvents(events);
   }, [currentUser]);
 
-  const handleEventClick = (info) => {
+  function handleEventClick(info) {
     info.jsEvent.preventDefault(); // Prevent default action
     const task = info.event;
     setSelectedTask({
@@ -52,7 +54,8 @@ export const DashBoardPage = () => {
       end: task.end,
       details: task.extendedProps.details,
       done: task.extendedProps.done,
-      id: task.id
+      id: task.id,
+      taskId:task.extendedProps.taskId
     });
     setIsModalOpen(true);
   };
@@ -72,6 +75,12 @@ export const DashBoardPage = () => {
           initialView="dayGridWeek"
           events={calendarEvents || []}
           height="100%"
+          locale="en-gb"
+          titleFormat={{ 
+            day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+                }}
           eventTimeFormat={{
             hour: "2-digit",
             minute: "2-digit",

@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import isBetween from "dayjs/plugin/isBetween";
+import toast, { Toaster } from 'react-hot-toast';
 
 dayjs.extend(isBetween);
 dayjs.extend(utc);
@@ -135,15 +136,15 @@ export const TaskPage = () => {
     const hasConflict = checkTaskConflict(newTaskStart, newTaskEnd, tasks);
 
     if (hasConflict) {
-      alert("the task cannot be carried out at these times ");
+      toast.error("the task cannot be carried out at these times ");
       return; // stop the submit
     }
     if (!taskData.content) {
-      alert("the task need a name ");
+      toast.error("the task need a name ");
       return; // stop the submit
     }
     if (newTaskStart.isBefore(dayjs())) {
-      alert("the new task can't be before now, stop this josh ");
+      toast.error("the new task can't be before now, stop this josh ");
       return; // stop the submit
     }
     try {
@@ -200,7 +201,7 @@ export const TaskPage = () => {
       {dateTaskDisplay.isSame(dayjs(), "day") ? (
         <h2>Today</h2>
       ) : (
-        <h2>{dateTaskDisplay.format("YYYY-MM-DD")}</h2>
+        <h2>{dateTaskDisplay.format("dddd DD-MM-YYYY")}</h2>
       )}
       <div className="container-line">
         <div className="previous-daily-task" onClick={goToPreviousDay}>
@@ -210,7 +211,7 @@ export const TaskPage = () => {
           {currentUser.plan && dailyTasks.length ? (
             <DailyTask dailyTasks={dailyTasks} />
           ) : (
-            <div>No task today</div>
+            <div className="text-center">No task today</div>
           )}
           {formTask && (
             <form className="task-form" onSubmit={handleTaskSubmit}>

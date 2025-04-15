@@ -2,6 +2,7 @@ import axios from "axios";
 import { createContext, useEffect, useState, useContext } from "react";
 import { AuthContext } from "./AuthContext";
 import dayjs from "dayjs";
+import toast, { Toaster } from 'react-hot-toast';
 
 const TaskContext = createContext();
 
@@ -109,6 +110,26 @@ const TaskContextWrapper = ({ children }) => {
     }
   }
 
+  // change mandatory task inside plan
+  async function changeTaskPlan( data){
+    try{
+      if(currentUser){
+        await axios.put(
+        `${import.meta.env.VITE_API_URL}/plan/${currentUser.plan._id}/replace-task`, {data}
+      );
+      }else{
+        toast.error("Need to be connected");
+      }
+      
+    }
+    catch(err){
+      toast.error(
+        err.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
+    }
+  }
+
   return (
     <TaskContext.Provider
       value={{
@@ -117,6 +138,7 @@ const TaskContextWrapper = ({ children }) => {
         tasksOfTheDay,
         dailyTasks,
         getTasksForDate,
+        changeTaskPlan
       }}
     >
       {children}

@@ -1,4 +1,5 @@
 import { useState, useContext } from "react";
+import toast, { Toaster } from 'react-hot-toast';
 import "./App.css";
 import "./css/form.css";
 import { Header } from "./components/Header";
@@ -96,6 +97,8 @@ function App() {
           }
         />
       </Routes>
+      <Toaster  position="top-left"
+  reverseOrder={false}/>
       <Footer />
 
       {/* Only show the chatbot for logged-in users */}

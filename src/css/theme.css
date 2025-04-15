@@ -43,6 +43,8 @@
     --form-task: #ffff;
     --form-input-task:#ffff;
     background-image: url("../assets/background.png");
+    --modal-background: #a8e6cf;
+    --task-title:#ffffff;
   }
 
   .dark-theme{
@@ -76,6 +78,8 @@
     --form-task: #8b5f70;
     --form-input-task: #830334;
     background-image: url("../assets/dark-background.png");
+    --modal-background: #8b5f70;
+    --task-title:#ffffff;
   }
 
   .lavanda-theme{
@@ -93,6 +97,7 @@
     --btn-success:#d8b4f8;
     --btn-success-hover:#e6e6fa;
     --title-app : #ffffff;
+    --task-title: #f5e6e8;
     --main-title: #8d76a1;
     --question-title: #8d76a1;
     --question-background: #d8d8d8;
@@ -110,4 +115,5 @@
     --form-task: #8d76a1;
     --form-input-task: #000;
     background-image: url("../assets/lavanda-background.png");
+    --modal-background: #d8d8d8;
   }

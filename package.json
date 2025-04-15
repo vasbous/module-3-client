@@ -19,6 +19,7 @@
     "dayjs": "^1.11.13",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.5.2",
     "react-pageflip": "^2.0.3",
     "react-router-dom": "^7.5.0"
   },

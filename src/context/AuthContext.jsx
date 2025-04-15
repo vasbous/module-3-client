@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import toast, { Toaster } from 'react-hot-toast';
 const AuthContext = createContext();
 
 const AuthContextWrapper = ({ children }) => {
@@ -39,7 +39,7 @@ const AuthContextWrapper = ({ children }) => {
         setIsLoading(false);
         setIsLoggedIn(true);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         setCurrentUser(null);
         setIsLoading(false);
         setIsLoggedIn(false);
@@ -71,8 +71,8 @@ const AuthContextWrapper = ({ children }) => {
       await authenticateUser();
       nav("/dashboard");
     } catch (err) {
-      console.log(err);
-      setErrorMessage(err.response.data.errorMessage);
+      // console.log(err);
+      toast.error(err.response.data.message);
     }
   }
 
@@ -92,15 +92,35 @@ const AuthContextWrapper = ({ children }) => {
         await authenticateUser();
         nav("/dashboard");
       } else {
-        setErrorMessage(response.data.message || "Signup failed");
+        toast.error(response.data.message || "Signup failed");
       }
     } catch (error) {
-      console.error("Signup error:", error);
-      setErrorMessage(
+      // console.error("Signup error:", error);
+      toast.error(
         error.response?.data?.message ||
           "Something went wrong. Please try again."
       );
     }
+  }
+
+  async function updateUser(property, data){
+    try {
+      const response = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/user/update/${property}/${currentUser._id}`,
+         data 
+      );
+      // console.log(response)
+      return response.data.userInDB
+    }
+      catch (error) {
+        console.log(error.response?.data?.message)
+        // console.error(error)
+        toast.error(
+          error.response?.data?.message ||
+            "Something went wrong. Please try again."
+        );
+        
+      }
   }
 
   const refetchUser = async (id) => {
@@ -116,7 +136,10 @@ const AuthContextWrapper = ({ children }) => {
         { plan: newPlan }
       );
     } catch (err) {
-      console.error(err);
+      toast.error(
+        err.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
     }
   }
 
@@ -134,6 +157,7 @@ const AuthContextWrapper = ({ children }) => {
         errorMessage,
         refetchUser,
         updateUserPlan,
+        updateUser
       }}
     >
       {children}
