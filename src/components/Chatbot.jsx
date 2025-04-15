@@ -274,16 +274,12 @@ Respond conversationally as if you're a supportive coach:
       };
 
       // Call the backend endpoint
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/gemini/chat`,
-        requestData,
-        {
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await axios.post(`${API_URL}/gemini/chat`, requestData, {
+        headers: {
+          authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       // Return the AI response from the backend
       return response.data.aiResponse;
@@ -336,7 +332,7 @@ Respond conversationally as if you're a supportive coach:
         try {
           // Get the most recent chat history directly from the database
           const userResponse = await axios.get(
-            `${import.meta.env.VITE_API_URL}/user/${currentUser._id}`,
+            `${API_URL}/user/${currentUser._id}`,
             {
               headers: {
                 authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -355,9 +351,7 @@ Respond conversationally as if you're a supportive coach:
 
           // Update the database with new chat history
           await axios.patch(
-            `${import.meta.env.VITE_API_URL}/user/update/chat_history/${
-              currentUser._id
-            }`,
+            `${API_URL}/user/update/chat_history/${currentUser._id}`,
             {
               chat_history: newChatHistory,
             },

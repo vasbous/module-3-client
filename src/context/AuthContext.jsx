@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
 const AuthContext = createContext();
 
 const AuthContextWrapper = ({ children }) => {
@@ -21,7 +21,7 @@ const AuthContextWrapper = ({ children }) => {
     } else {
       try {
         const responseFromVerifyRoute = await axios.get(
-          `${import.meta.env.VITE_API_URL}/auth/verify`,
+          `${API_URL}/auth/verify`,
           {
             headers: {
               authorization: `Bearer ${tokenFromLocalStorage}`,
@@ -30,9 +30,7 @@ const AuthContextWrapper = ({ children }) => {
         );
 
         const currentUserData = await axios.get(
-          `${import.meta.env.VITE_API_URL}/user/${
-            responseFromVerifyRoute.data.payload._id
-          }`
+          `${API_URL}/user/${responseFromVerifyRoute.data.payload._id}`
         );
 
         setCurrentUser(currentUserData.data);
@@ -61,10 +59,7 @@ const AuthContextWrapper = ({ children }) => {
 
   async function loginUser(data) {
     try {
-      const connexion = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/login`,
-        data
-      );
+      const connexion = await axios.post(`${API_URL}/auth/login`, data);
 
       console.log("user was logged in", connexion.data);
       localStorage.setItem("authToken", connexion.data.authToken);
@@ -78,15 +73,11 @@ const AuthContextWrapper = ({ children }) => {
 
   async function createUser(data) {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/signup`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await axios.post(`${API_URL}/auth/signup`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       if (response.status === 201) {
         localStorage.setItem("authToken", response.data.token);
         await authenticateUser();
@@ -103,28 +94,26 @@ const AuthContextWrapper = ({ children }) => {
     }
   }
 
-  async function updateUser(property, data){
+  async function updateUser(property, data) {
     try {
       const response = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/user/update/${property}/${currentUser._id}`,
-         data 
+        `${API_URL}/user/update/${property}/${currentUser._id}`,
+        data
       );
       // console.log(response)
-      return response.data.userInDB
+      return response.data.userInDB;
+    } catch (error) {
+      console.log(error.response?.data?.message);
+      // console.error(error)
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
     }
-      catch (error) {
-        console.log(error.response?.data?.message)
-        // console.error(error)
-        toast.error(
-          error.response?.data?.message ||
-            "Something went wrong. Please try again."
-        );
-        
-      }
   }
 
   const refetchUser = async (id) => {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/user/${id}`);
+    const res = await axios.get(`${API_URL}/user/${id}`);
     setCurrentUser(res.data);
   };
 
@@ -132,13 +121,12 @@ const AuthContextWrapper = ({ children }) => {
   async function updateUserPlan(newPlan) {
     try {
       const userUpdate = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/user/update/plan/${currentUser._id}`,
+        `${API_URL}/user/update/plan/${currentUser._id}`,
         { plan: newPlan }
       );
     } catch (err) {
       toast.error(
-        err.response?.data?.message ||
-          "Something went wrong. Please try again."
+        err.response?.data?.message || "Something went wrong. Please try again."
       );
     }
   }
@@ -157,7 +145,7 @@ const AuthContextWrapper = ({ children }) => {
         errorMessage,
         refetchUser,
         updateUserPlan,
-        updateUser
+        updateUser,
       }}
     >
       {children}

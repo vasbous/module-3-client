@@ -28,9 +28,7 @@ export const SignupQuestionsPage = () => {
     const fetchGoals = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/goal`
-        );
+        const response = await axios.get(`${API_URL}/goal`);
         setGoals(response.data);
         setIsLoading(false);
       } catch (error) {
@@ -201,9 +199,7 @@ export const SignupQuestionsPage = () => {
 
       // Save to user profile
       await axios.patch(
-        `${import.meta.env.VITE_API_URL}/user/update/goal_details/${
-          currentUser._id
-        }`,
+        `${API_URL}/user/update/goal_details/${currentUser._id}`,
         { goal_details: goalDetails }
       );
 
@@ -289,9 +285,7 @@ export const SignupQuestionsPage = () => {
       if (!currentUser) return;
 
       await axios.patch(
-        `${import.meta.env.VITE_API_URL}/user/update/signupCompleted/${
-          currentUser._id
-        }`,
+        `${API_URL}/user/update/signupCompleted/${currentUser._id}`,
         { signupCompleted: true }
       );
 

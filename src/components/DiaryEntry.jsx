@@ -26,7 +26,7 @@ export const DiaryEntry = () => {
           currentUser.diaries.length > 0
         ) {
           const diariesResponse = await axios.get(
-            `${import.meta.env.VITE_API_URL}/diary/user/recent`,
+            `${API_URL}/diary/user/recent`,
             {
               headers: {
                 authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -38,14 +38,11 @@ export const DiaryEntry = () => {
 
         // If in edit mode, fetch the current diary entry
         if (isEditMode) {
-          const response = await axios.get(
-            `${import.meta.env.VITE_API_URL}/diary/${diaryId}`,
-            {
-              headers: {
-                authorization: `Bearer ${localStorage.getItem("authToken")}`,
-              },
-            }
-          );
+          const response = await axios.get(`${API_URL}/diary/${diaryId}`, {
+            headers: {
+              authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          });
 
           setContent(response.data.content || "");
           setMoodScore(response.data.mood_score || 5);
@@ -125,7 +122,7 @@ Don't start with any preamble. Just provide the feedback in the three sections.
 
       // Call the backend endpoint
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/gemini/diary-feedback`,
+        `${API_URL}/gemini/diary-feedback`,
         requestData,
         {
           headers: {
@@ -167,28 +164,20 @@ Don't start with any preamble. Just provide the feedback in the three sections.
 
       if (isEditMode) {
         // Update existing entry
-        response = await axios.patch(
-          `${import.meta.env.VITE_API_URL}/diary/${diaryId}`,
-          diaryData,
-          {
-            headers: {
-              authorization: `Bearer ${localStorage.getItem("authToken")}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        response = await axios.patch(`${API_URL}/diary/${diaryId}`, diaryData, {
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            "Content-Type": "application/json",
+          },
+        });
       } else {
         // Create new entry
-        response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/diary`,
-          diaryData,
-          {
-            headers: {
-              authorization: `Bearer ${localStorage.getItem("authToken")}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        response = await axios.post(`${API_URL}/diary`, diaryData, {
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            "Content-Type": "application/json",
+          },
+        });
 
         if (!currentUser) {
           return <div>Loading user data...</div>;
@@ -201,9 +190,7 @@ Don't start with any preamble. Just provide the feedback in the three sections.
             response.data._id,
           ];
           await axios.patch(
-            `${import.meta.env.VITE_API_URL}/user/update/diaries/${
-              currentUser._id
-            }`,
+            `${API_URL}/user/update/diaries/${currentUser._id}`,
             { diaries: newArrayDiaries },
             {
               headers: {

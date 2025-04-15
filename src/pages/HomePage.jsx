@@ -1,5 +1,5 @@
 import React from "react";
-import "../css/HomePage.css";
+import "../css/homePage.css";
 import { Link } from "react-router-dom";
 import question from "../assets/questionne.png";
 import road from "../assets/chemin.png";

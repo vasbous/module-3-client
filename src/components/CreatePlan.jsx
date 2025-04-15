@@ -19,9 +19,7 @@ export const CreatePlan = () => {
       try {
         if (currentUser && currentUser.goal_details.selectedGoal) {
           const allTasksLibrary = await axios.get(
-            `${import.meta.env.VITE_API_URL}/task/category/${
-              currentUser.goal_details.selectedGoal
-            }`
+            `${API_URL}/task/category/${currentUser.goal_details.selectedGoal}`
           );
           setAllGoalTasks(allTasksLibrary.data);
         }
@@ -118,7 +116,7 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
 
       // Call the backend endpoint
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/gemini/create-plan`,
+        `${API_URL}/gemini/create-plan`,
         requestData,
         {
           headers: {
@@ -152,15 +150,11 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
       const planData = await getAIPlan();
 
       // First create the plan with start and end dates
-      const planResponse = await axios.post(
-        `${import.meta.env.VITE_API_URL}/plan`,
-        planData.plan,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const planResponse = await axios.post(`${API_URL}/plan`, planData.plan, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       const createdPlan = planResponse.data;
       console.log("Created plan:", createdPlan);
@@ -175,7 +169,7 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
 
       // Update the plan with the tasks
       await axios.patch(
-        `${import.meta.env.VITE_API_URL}/plan/${createdPlan._id}`,
+        `${API_URL}/plan/${createdPlan._id}`,
         { tasks: formattedTasks },
         {
           headers: {
@@ -187,7 +181,7 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
 
       // Update user with the plan ID
       await axios.patch(
-        `${import.meta.env.VITE_API_URL}/user/update/plan/${currentUser._id}`,
+        `${API_URL}/user/update/plan/${currentUser._id}`,
         { plan: createdPlan._id },
         {
           headers: {

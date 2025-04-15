@@ -15,14 +15,11 @@ export const DiaryDashboard = () => {
   const fetchTodayEntry = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/diary/today`,
-        {
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        }
-      );
+      const response = await axios.get(`${API_URL}/diary/today`, {
+        headers: {
+          authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
 
       if (response.data) {
         setTodayEntry(response.data);

@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import isBetween from "dayjs/plugin/isBetween";
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
 
 dayjs.extend(isBetween);
 dayjs.extend(utc);
@@ -148,10 +148,7 @@ export const TaskPage = () => {
       return; // stop the submit
     }
     try {
-      const newTask = await axios.post(
-        `${import.meta.env.VITE_API_URL}/task`,
-        taskData
-      );
+      const newTask = await axios.post(`${API_URL}/task`, taskData);
 
       const taskDate = localTimezoneIso(dateData);
       const taskEndDate = localTimezoneIso(endDateData);
@@ -167,10 +164,7 @@ export const TaskPage = () => {
           ],
         };
 
-        const newPlan = await axios.post(
-          `${import.meta.env.VITE_API_URL}/plan`,
-          planData
-        );
+        const newPlan = await axios.post(`${API_URL}/plan`, planData);
         await updateUserPlan(newPlan.data);
       } else {
         const newTaskForPlan = {
@@ -179,10 +173,9 @@ export const TaskPage = () => {
           endDate: taskEndDate,
         };
         const newTasksPlan = [...currentUser.plan.tasks, newTaskForPlan];
-        await axios.patch(
-          `${import.meta.env.VITE_API_URL}/plan/${currentUser.plan._id}`,
-          { tasks: newTasksPlan }
-        );
+        await axios.patch(`${API_URL}/plan/${currentUser.plan._id}`, {
+          tasks: newTasksPlan,
+        });
       }
 
       await refetchUser(currentUser._id);

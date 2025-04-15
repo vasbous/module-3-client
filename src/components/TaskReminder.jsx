@@ -42,7 +42,7 @@ export const TaskReminder = () => {
     try {
       const today = new Date();
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/plan/tasks/${
+        `${API_URL}/plan/tasks/${
           currentUser.plan._id
         }?date=${today.toISOString()}`,
         {
@@ -142,7 +142,7 @@ export const TaskReminder = () => {
 
       // Get current chat history
       const userResponse = await axios.get(
-        `${import.meta.env.VITE_API_URL}/user/${currentUser._id}`,
+        `${API_URL}/user/${currentUser._id}`,
         {
           headers: {
             authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -160,9 +160,7 @@ export const TaskReminder = () => {
 
       // Update the database with new chat history
       await axios.patch(
-        `${import.meta.env.VITE_API_URL}/user/update/chat_history/${
-          currentUser._id
-        }`,
+        `${API_URL}/user/update/chat_history/${currentUser._id}`,
         {
           chat_history: newChatHistory,
         },

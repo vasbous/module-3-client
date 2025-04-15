@@ -2,7 +2,7 @@ import axios from "axios";
 import { createContext, useEffect, useState, useContext } from "react";
 import { AuthContext } from "./AuthContext";
 import dayjs from "dayjs";
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
 
 const TaskContext = createContext();
 
@@ -28,12 +28,9 @@ const TaskContextWrapper = ({ children }) => {
         return task;
       });
 
-      await axios.patch(
-        `${import.meta.env.VITE_API_URL}/plan/${currentUser.plan._id}`,
-        {
-          tasks: updatedTasks,
-        }
-      );
+      await axios.patch(`${API_URL}/plan/${currentUser.plan._id}`, {
+        tasks: updatedTasks,
+      });
 
       await refetchUser(currentUser._id);
     } catch (err) {
@@ -56,16 +53,11 @@ const TaskContextWrapper = ({ children }) => {
         );
 
         //update the plan with new array Tasks
-        await axios.patch(
-          `${import.meta.env.VITE_API_URL}/plan/${currentUser.plan._id}`,
-          {
-            tasks: updatedTasks,
-          }
-        );
+        await axios.patch(`${API_URL}/plan/${currentUser.plan._id}`, {
+          tasks: updatedTasks,
+        });
         // delete Task
-        await axios.delete(
-          `${import.meta.env.VITE_API_URL}/task/${taskToDelete.task._id}`
-        );
+        await axios.delete(`${API_URL}/task/${taskToDelete.task._id}`);
         // refetch the user
 
         await refetchUser(currentUser._id);
@@ -77,9 +69,7 @@ const TaskContextWrapper = ({ children }) => {
   async function getTasksForDate(date) {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/plan/tasks/${
-          currentUser.plan._id
-        }?date=${date}`,
+        `${API_URL}/plan/tasks/${currentUser.plan._id}?date=${date}`,
         {
           headers: {
             authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -97,7 +87,7 @@ const TaskContextWrapper = ({ children }) => {
   async function tasksOfTheDay() {
     try {
       const tasks = await axios.get(
-        `${import.meta.env.VITE_API_URL}/plan/tasks/${currentUser.plan._id}`,
+        `${API_URL}/plan/tasks/${currentUser.plan._id}`,
         {
           headers: {
             authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -111,21 +101,19 @@ const TaskContextWrapper = ({ children }) => {
   }
 
   // change mandatory task inside plan
-  async function changeTaskPlan( data){
-    try{
-      if(currentUser){
+  async function changeTaskPlan(data) {
+    try {
+      if (currentUser) {
         await axios.put(
-        `${import.meta.env.VITE_API_URL}/plan/${currentUser.plan._id}/replace-task`, {data}
-      );
-      }else{
+          `${API_URL}/plan/${currentUser.plan._id}/replace-task`,
+          { data }
+        );
+      } else {
         toast.error("Need to be connected");
       }
-      
-    }
-    catch(err){
+    } catch (err) {
       toast.error(
-        err.response?.data?.message ||
-          "Something went wrong. Please try again."
+        err.response?.data?.message || "Something went wrong. Please try again."
       );
     }
   }
@@ -138,7 +126,7 @@ const TaskContextWrapper = ({ children }) => {
         tasksOfTheDay,
         dailyTasks,
         getTasksForDate,
-        changeTaskPlan
+        changeTaskPlan,
       }}
     >
       {children}

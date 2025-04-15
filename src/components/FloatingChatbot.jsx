@@ -132,7 +132,7 @@ Feel free to send me a message anytime you need assistance!`;
 
       // Get current chat history
       const userResponse = await axios.get(
-        `${import.meta.env.VITE_API_URL}/user/${currentUser._id}`,
+        `${API_URL}/user/${currentUser._id}`,
         {
           headers: {
             authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -150,9 +150,7 @@ Feel free to send me a message anytime you need assistance!`;
 
       // Update the database with new chat history
       await axios.patch(
-        `${import.meta.env.VITE_API_URL}/user/update/chat_history/${
-          currentUser._id
-        }`,
+        `${API_URL}/user/update/chat_history/${currentUser._id}`,
         {
           chat_history: newChatHistory,
         },
