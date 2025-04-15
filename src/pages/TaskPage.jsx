@@ -9,6 +9,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import isBetween from "dayjs/plugin/isBetween";
 import toast, { Toaster } from "react-hot-toast";
+import { API_URL } from "../config/config";
 
 dayjs.extend(isBetween);
 dayjs.extend(utc);

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import "../css/Chatbot.css";
+import { API_URL } from "../config/config";
 
 export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
   const { currentUser, refetchUser } = useContext(AuthContext);

@@ -3,6 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../css/DiaryDashboard.css";
+import { API_URL } from "../config/config";
 
 export const DiaryDashboard = () => {
   const [todayEntry, setTodayEntry] = useState(null);

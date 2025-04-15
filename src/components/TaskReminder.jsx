@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
+import { API_URL } from "../config/config";
 
 export const TaskReminder = () => {
   const { currentUser } = useContext(AuthContext);

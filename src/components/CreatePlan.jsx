@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import "../css/CreatePlan.css";
+import { API_URL } from "../config/config";
 
 export const CreatePlan = () => {
   const navigate = useNavigate();

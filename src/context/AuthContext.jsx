@@ -2,6 +2,7 @@ import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import { API_URL } from "../config/config";
 const AuthContext = createContext();
 
 const AuthContextWrapper = ({ children }) => {

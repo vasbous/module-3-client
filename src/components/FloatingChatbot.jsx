@@ -3,6 +3,7 @@ import { Chatbot } from "./Chatbot";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import "../css/FloatingChatbot.css";
+import { API_URL } from "../config/config";
 
 export const FloatingChatbot = () => {
   const { currentUser, isLoggedIn, refetchUser } = useContext(AuthContext);

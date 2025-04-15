@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import "../css/DiaryEntry.css";
+import { API_URL } from "../config/config";
 
 export const DiaryEntry = () => {
   const { diaryId } = useParams();

@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
 import "./App.css";
 import "./css/form.css";
 import { Header } from "./components/Header";
@@ -20,6 +20,7 @@ import { ProfilPage } from "./pages/ProfilPage";
 import { FloatingChatbot } from "./components/FloatingChatbot";
 import { AuthContext } from "./context/AuthContext";
 import { TaskReminder } from "./components/TaskReminder";
+import { API_URL } from "./config/config";
 
 function App() {
   const { isLoggedIn } = useContext(AuthContext);
@@ -98,8 +99,7 @@ function App() {
           }
         />
       </Routes>
-      <Toaster  position="top-left"
-  reverseOrder={false}/>
+      <Toaster position="top-left" reverseOrder={false} />
       <Footer />
       <TaskReminder />
       {/* Only show the chatbot for logged-in users */}
