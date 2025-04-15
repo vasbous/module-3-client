@@ -266,42 +266,27 @@ Respond conversationally as if you're a supportive coach:
 
   const getAIResponse = async (userMessage) => {
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      const prompt = generateGeminiPrompt(userMessage);
+      // Prepare the data to send to the backend
+      const requestData = {
+        userMessage,
+        messages,
+        currentUser,
+      };
 
+      // Call the backend endpoint
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        `${import.meta.env.VITE_API_URL}/gemini/chat`,
+        requestData,
         {
-          contents: [
-            {
-              parts: [
-                {
-                  text: prompt,
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 600,
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            "Content-Type": "application/json",
           },
         }
       );
 
-      // Extract the text response from Gemini
-      let aiResponse = "";
-      if (
-        response.data &&
-        response.data.candidates &&
-        response.data.candidates[0] &&
-        response.data.candidates[0].content &&
-        response.data.candidates[0].content.parts &&
-        response.data.candidates[0].content.parts[0]
-      ) {
-        aiResponse = response.data.candidates[0].content.parts[0].text.trim();
-      }
-
-      return aiResponse;
+      // Return the AI response from the backend
+      return response.data.aiResponse;
     } catch (error) {
       console.error("Error getting AI response:", error);
       return "I'm having trouble connecting right now. Please try again later.";

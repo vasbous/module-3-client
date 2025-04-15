@@ -108,69 +108,35 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
 
   const getAIPlan = async () => {
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      const prompt = generateGeminiPrompt();
-      console.log("Sending prompt to Gemini for plan generation:", prompt);
+      // Prepare the data to send to the backend
+      const requestData = {
+        currentUser,
+        allGoalTasks,
+      };
 
+      console.log("Sending data to backend for plan generation:", requestData);
+
+      // Call the backend endpoint
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        `${import.meta.env.VITE_API_URL}/gemini/create-plan`,
+        requestData,
         {
-          contents: [
-            {
-              parts: [
-                {
-                  text: prompt,
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 8192,
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            "Content-Type": "application/json",
           },
         }
       );
 
-      // Log the full raw response
-      console.log("Full Gemini API response for plan:", response);
+      console.log("Backend response for plan:", response.data);
 
-      // Log the data portion
-      console.log("Gemini plan response.data:", response.data);
-
-      // Extract the text response from Gemini
-      let aiResponse = "";
-      if (
-        response.data &&
-        response.data.candidates &&
-        response.data.candidates[0] &&
-        response.data.candidates[0].content &&
-        response.data.candidates[0].content.parts &&
-        response.data.candidates[0].content.parts[0]
-      ) {
-        aiResponse = response.data.candidates[0].content.parts[0].text;
-        console.log("Extracted AI plan response text:", aiResponse);
-      }
-
-      // Parse the JSON response
-      console.log("Attempting to parse JSON response...");
-
-      aiResponse = aiResponse
-        .trim()
-        .replace(/^```json\s*/i, "")
-        .replace(/```$/, "")
-        .trim();
-
-      const planData = JSON.parse(aiResponse);
-      console.log("Successfully parsed plan data:", planData);
-      return planData;
+      // Return the plan data from the backend
+      return response.data.planData;
     } catch (error) {
       console.error("Error getting AI plan:", error);
       if (error.response) {
         console.error("Error response data:", error.response.data);
         console.error("Error response status:", error.response.status);
-      }
-      if (error instanceof SyntaxError) {
-        console.error("JSON parsing error. Raw text received:", aiResponse);
       }
       throw new Error("Failed to generate plan. Please try again later.");
     }
