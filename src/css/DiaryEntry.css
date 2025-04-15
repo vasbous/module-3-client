@@ -60,7 +60,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--dark-pink);
+  background: var(--color-title);
   cursor: pointer;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
@@ -69,7 +69,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--dark-pink);
+  background: var(--color-title);
   cursor: pointer;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
@@ -109,7 +109,7 @@
 
 .diary-content:focus {
   outline: none;
-  border-color: var(--dark-pink);
+  border-color: var(--color-title);
   box-shadow: 0 0 5px rgba(253, 111, 166, 0.5);
 }
 
@@ -126,7 +126,7 @@
   align-items: center;
   font-family: "Caveat", cursive;
   font-size: 2rem;
-  color: var(--dark-pink);
+  color: var(--color-title);
 }
 
 /* Responsive adjustments */

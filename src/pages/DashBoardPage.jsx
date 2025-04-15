@@ -10,11 +10,14 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import "../css/calendar.css";
+import { TaskDetailsModal } from "../components/TaskDetailsModal"; 
 
 export const DashBoardPage = () => {
   const { tasksOfTheDay, dailyTasks } = useContext(TaskContext);
   const { currentUser } = useContext(AuthContext);
   const [calendarEvents, setCalendarEvents] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
   useEffect(() => {
     if (currentUser.plan) {
       tasksOfTheDay();
@@ -25,7 +28,7 @@ export const DashBoardPage = () => {
       const endDate = new Date(oneTask.endDate);
       // const hours = oneTask.time;
       // date.setHours(hours, 0, 0, 0)
-      console.log(oneTask);
+      console.log(oneTask.task.description);
       return {
         title: oneTask.task.content,
         start: startDate,
@@ -34,10 +37,32 @@ export const DashBoardPage = () => {
         allDay: false,
         done: oneTask.done,
         color: oneTask.done ? "#4CAF50" : "#f44336",
+        details: oneTask.task.description
       };
     });
     setCalendarEvents(events);
   }, [currentUser]);
+
+  const handleEventClick = (info) => {
+    info.jsEvent.preventDefault(); // Prevent default action
+    const task = info.event;
+    setSelectedTask({
+      title: task.title,
+      start: task.start,
+      end: task.end,
+      details: task.extendedProps.details,
+      done: task.extendedProps.done,
+      id: task.id
+    });
+    setIsModalOpen(true);
+  };
+
+  function closeModal() {
+    setIsModalOpen(false);
+    setSelectedTask(null);
+  };
+
+  
 
   return (
     <div className="container">
@@ -58,8 +83,14 @@ export const DashBoardPage = () => {
             right: "dayGridWeek,listWeek", // user can switch between the two
           }}
           firstDay={1}
+          eventClick={handleEventClick}
 
           // dateClick={(info) => alert(`Tu as cliqué le ${info.dateStr}`)}
+          // eventClick={(info) => {
+          //   info.jsEvent.preventDefault(); // évite d'ouvrir un lien si présent
+          //   const task = info.event;
+          //   const { title, start, end, extendedProps } = task;
+          //   alert(`details: ${extendedProps.details}`);  }}
         />
       </div>
       <div className="task-diary-score-container">
@@ -102,6 +133,12 @@ export const DashBoardPage = () => {
           </div>
         </div>
       </div>
+      <TaskDetailsModal 
+        isOpen={isModalOpen} 
+        onClose={closeModal} 
+        taskDetails={selectedTask || {}} 
+      />
     </div>
+    
   );
 };

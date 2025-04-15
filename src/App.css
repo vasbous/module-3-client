@@ -1,16 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
-:root {
-  --pink: #f8afcb;
-  --dark-pink: #fd6fa6;
-  --green: #a8e6cf;
-  --blue: #a7d3f3;
-  --yellow: #fff5a5;
-  --orange: #fdc8a7;
-  --purple-pink: #d8b4f8;
-  --white: #ffffff;
-  --black: #000;
-}
 
 * {
   margin: 0;
@@ -21,7 +10,7 @@
   font-style: normal;
 }
 body {
-  background-image: url("assets/background.png");
+  
   background-size: cover;
   /* background: linear-gradient(
     20deg,
@@ -43,7 +32,7 @@ header {
 footer {
   height: 12vh;
   border-radius: 5px 5px 0px 0px;
-  background: var(--pink);
+  background: var(--footer-background);
 }
 .auth {
   width: 33vw;
@@ -68,6 +57,7 @@ footer {
   align-items: center;
   gap: 10px;
 }
+.profil-container,
 .form-container,
 .calendar-container,
 .task-container,
@@ -86,7 +76,7 @@ footer {
   width: min(70vw, 500px);
   height: min(70vh, 500px);
   margin: auto;
-  background-color: var(--blue);
+  background-color: var(--main-container-background);
   border-radius: 25px;
 }
 .calendar-container,
@@ -101,29 +91,31 @@ footer {
 .score-container {
   margin-bottom: 10px;
 }
+.profil-container,
 .calendar-container,
 .diary-container,
 .score-container {
-  background: var(--blue);
+  background: var(--main-container-background);
   border-radius: 15px;
 }
 
 .task-container {
-  background: var(--white);
+  color: var(--texte-dark);
+  background: var(--text-container);
   border-radius: 15px;
   background-image: repeating-linear-gradient(
       to bottom,
       transparent,
       transparent 35px,
-      var(--blue) 36px
+      var(--text-ligneH-container) 36px
     ),
     /* lignes horizontales */
       linear-gradient(
         to right,
         transparent 0px,
         transparent 50px,
-        #ffb0b0 50px,
-        #ffb0b0 52px,
+        var(--text-ligneV-container) 50px,
+        var(--text-ligneV-container) 52px,
         transparent 50px,
         transparent 56px
       );
@@ -136,7 +128,7 @@ footer {
   margin: 5px;
 }
 .daily-task-title-container h3 {
-  color: var(--pink);
+  color: var( --sub-title);
 }
 
 /* TaskPage */
@@ -197,9 +189,9 @@ footer {
   padding: 0 12px;
   height: 2.3rem;
   line-height: 2.3rem;
-  color: var(--white);
-  background-color: var(--blue);
-  border: 1px solid var(--blue);
+  color: var(--text-btn-primary);
+  background-color: var(--btn);
+  border: 1px solid var(--btn);
   border-radius: 12px;
   /* box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px,
     rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset; */
@@ -214,13 +206,18 @@ footer {
     rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
 }
 .btn-success {
-  background-color: var(--dark-pink);
-  border: 1px solid var(--dark-pink);
+  background-color: var(--btn-success);
+  border: 1px solid var(--btn-success);
 }
 .btn-success:hover {
-  background-color: var(--green);
-  border: 1px solid var(--green);
+  background-color: var(--btn-success-hover);
+  border: 1px solid var(--btn-success-hover);
 }
+.btn-info{
+  background-color: var(--btn-success-hover);
+  border: 1px solid var(--btn-success-hover);
+}
+
 
 /* TEXT OPTION */
 .text-center {
@@ -235,17 +232,18 @@ h4,
   font-weight: 700;
 }
 .title-app {
-  color: var(--white);
+  color: var(--title-app);
   font-weight: 900;
 }
 h2 {
-  color: var(--white);
+  color: var(--main-title);
   font-size: 2rem;
 }
 h3 {
-  color: var(--white);
+  color: var(--main-title);
   font-size: 1.5rem;
 }
+
 a {
   text-decoration: none;
 }
@@ -259,7 +257,7 @@ a {
   width: min(80vw, 600px);
   min-height: min(80vh, 600px);
   margin: auto;
-  background-color: var(--blue);
+  background-color: var(--main-container-background);
   border-radius: 25px;
   padding: 30px 20px;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
@@ -271,8 +269,8 @@ a {
   font-family: "Fredoka", sans-serif;
   font-weight: 600;
   font-size: 1.2rem;
-  color: var(--dark-pink);
-  background-color: var(--white);
+  color: var(--question-title);
+  background-color: var(--question-background);
   padding: 8px 15px;
   border-radius: 15px;
   margin-bottom: 10px;
@@ -281,7 +279,7 @@ a {
 .goal-instruction {
   text-align: center;
   margin-bottom: 20px;
-  color: var(--white);
+  color: var(--question-instruction);
 }
 
 .goals-grid {
@@ -297,7 +295,7 @@ a {
   justify-content: center;
   align-items: center;
   height: 80px;
-  background-color: var(--white);
+  background-color: var(--question-background);
   border-radius: 15px;
   padding: 10px;
   cursor: pointer;
@@ -307,7 +305,7 @@ a {
 .goal-card h4 {
   font-family: "Fredoka", sans-serif;
   font-weight: 600;
-  color: var(--dark-pink);
+  color: var(--question-title);
   text-align: center;
 }
 
@@ -317,8 +315,8 @@ a {
 }
 
 .goal-card.selected {
-  background-color: var(--green);
-  border: 2px solid var(--dark-pink);
+  background-color: var(--question-selected);
+  border: 2px solid var(--question-title);
 }
 
 .question-container {
@@ -343,8 +341,8 @@ a {
   border-radius: 10px;
   font-size: 1.5rem;
   text-align: center;
-  background-color: var(--white);
-  color: var(--dark-pink);
+  background-color: var(--question-background);
+  color: var(--question-title);
   outline: none;
 }
 
@@ -360,19 +358,19 @@ a {
   align-items: center;
   min-height: 50px;
   padding: 10px 15px;
-  background-color: var(--white);
+  background-color: var(--question-background);
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .option-card:hover {
-  background-color: var(--yellow);
+  background-color: var(--question-hover);
 }
 
 .option-card.selected {
-  background-color: var(--green);
-  border: 2px solid var(--dark-pink);
+  background-color: var(--question-selected);
+  border: 2px solid var( --question-title);
 }
 
 .navigation-buttons {
@@ -389,7 +387,7 @@ a {
   align-items: center;
   height: 60vh;
   font-size: 1.5rem;
-  color: var(--dark-pink);
+  color: var( --question-title);
 }
 
 @media only screen and (min-width: 680px) {
@@ -439,7 +437,7 @@ a {
     backdrop-filter: blur(5.3px);
     -webkit-backdrop-filter: blur(5.3px);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    color: var(--dark-pink);
+    color: var( --question-title);
   }
   .previous-daily-task {
     border-radius: 25px 0px 0px 25px;
@@ -451,7 +449,7 @@ a {
   .next-daily-task:hover {
     cursor: pointer;
     background: rgba(255, 255, 255, 0.603);
-    color: var(--pink);
+    color: var(--sub-title);
   }
   .diary-main-container {
     margin: 10px 0px;

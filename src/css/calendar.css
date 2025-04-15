@@ -4,15 +4,15 @@
     
 }
 .fc .fc-button-primary{
-    background: var(--green);
+    background: var(--btn-primary);
 }
 .fc .fc-button-primary:not(:disabled).fc-button-active, .fc .fc-button-primary:not(:disabled):active{
-    background: var(--dark-pink);
+    background: var( --calendar-active);
 }
 
 .fc .fc-toolbar-title{
     font-family: "Fredoka", sans-serif;
-    color: var(--dark-pink);
+    color: var(--color-title);
 }
 .fc ,.fc-daygrid-day-number, .fc-event{
     font-family: "Nunito", sans-serif;
@@ -20,12 +20,12 @@
   }
 
   th.fc-day{
-    background: var(--green);
+    background: var(--calendar-day);
     color: white;
   }
   th.fc-day-today{
-    background: var(--dark-pink);
+    background: var( --calendar-active);
   }
   .fc .fc-daygrid-day.fc-day-today{
-    background-color: var(--pink);
+    background-color: var(--calendar-daygrid-day);
   }

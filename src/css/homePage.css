@@ -23,6 +23,7 @@ width: 100%;
     width: 33%;
     text-align: center;
     word-wrap: break-word;
+    color:var(--white);
     
 }
 .title-button-home{
@@ -109,4 +110,4 @@ width: 100%;
 .fourth-wave .shape-fill {fill: var(--yellow)}
 .five-wave .shape-fill {fill: var(--purple-pink)}
 .six-wave .shape-fill {fill: var(--blue)}
-.seven-wave .shape-fill {fill: var(--pink)}
+.seven-wave .shape-fill {fill: var(--footer-background)}

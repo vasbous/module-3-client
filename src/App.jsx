@@ -15,6 +15,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { SignupQuestionsPage } from "./pages/SignupQuestionsPage";
 import { ProtectedQuestionRoute } from "./components/ProtectedQuestionRoute";
 import { CreatePlan } from "./components/CreatePlan";
+import { ProfilPage } from "./pages/ProfilPage";
 
 function App() {
   return (
@@ -78,6 +79,15 @@ function App() {
           element={
             <ProtectedQuestionRoute>
               <CreatePlan />
+            </ProtectedQuestionRoute>
+          }
+        />
+
+        <Route
+          path="/profil"
+          element={
+            <ProtectedQuestionRoute>
+              <ProfilPage />
             </ProtectedQuestionRoute>
           }
         />
