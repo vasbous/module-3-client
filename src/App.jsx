@@ -19,6 +19,7 @@ import { CreatePlan } from "./components/CreatePlan";
 import { ProfilPage } from "./pages/ProfilPage";
 import { FloatingChatbot } from "./components/FloatingChatbot";
 import { AuthContext } from "./context/AuthContext";
+import { TaskReminder } from "./components/TaskReminder";
 
 function App() {
   const { isLoggedIn } = useContext(AuthContext);
@@ -100,7 +101,7 @@ function App() {
       <Toaster  position="top-left"
   reverseOrder={false}/>
       <Footer />
-
+      <TaskReminder />
       {/* Only show the chatbot for logged-in users */}
       {isLoggedIn && <FloatingChatbot />}
     </>

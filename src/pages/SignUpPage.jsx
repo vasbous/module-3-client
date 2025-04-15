@@ -44,7 +44,7 @@ export const SignUpPage = () => {
               required
             />
             <label htmlFor="username" className="label">
-              Username
+              First Name
             </label>
             <div className="underline"></div>
           </div>
