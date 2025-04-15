@@ -143,7 +143,7 @@
 .ai-response-header {
   font-family: "Caveat", cursive !important;
   font-size: 1.3rem;
-  color: var(--dark-pink);
+  color: var(--color-title);
   font-weight: bold;
   margin-top: 10px;
   margin-bottom: 5px;
@@ -227,12 +227,12 @@
 }
 
 .btn-navi {
-  background-color: var(--blue);
-  border: 1px solid var(--blue);
+  background-color: var(--btn);
+  border: 1px solid var(--btn);
 }
 .btn-navi:hover {
-  background-color: var(--green);
-  border: 1px solid var(--green);
+  background-color: var(--btn-success-hover);
+  border: 1px solid var(--btn-success-hover);
 }
 
 /* Ensure first page content starts after header */

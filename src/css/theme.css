@@ -1,0 +1,113 @@
+:root {
+    --pink: #f8afcb;
+    --dark-pink: #fd6fa6;
+    --green: #a8e6cf;
+    --blue: #a7d3f3;
+    --yellow: #fff5a5;
+    --orange: #fdc8a7;
+    --purple-pink: #d8b4f8;
+    --white: #ffffff;
+    --black: #000;
+    
+  }
+  /* change value and set up theme */
+
+  .default-theme{
+    --main-container-background:#a7d3f3;
+    --footer-background: #f8afcb;
+    --text-container: #ffffff;
+    --texte-dark: #000;
+    --text-ligneH-container:#a7d3f3;
+    --text-ligneV-container: #fd6fa6;
+    --sub-title: #f8afcb;
+    --text-light:#ffffff;
+    --btn:#a7d3f3;
+    --text-btn-primary:#ffffff;
+    --btn-success:#fd6fa6;
+    --btn-success-hover:#a8e6cf;
+    --title-app : #ffffff;
+    --main-title: #ffffff;
+    --question-title: #fd6fa6;
+    --question-background: #ffffff;
+    --question-selected:#a8e6cf;
+    --question-instruction: #ffffff;
+    --question-hover: #fff5a5;
+    --btn-primary:#a8e6cf;
+    --calendar-active:#fd6fa6;
+    --color-title: #fd6fa6;
+    --calendar-day:#a8e6cf;
+    --calendar-daygrid-day:#f8afcb;
+    --success-background:#a8e6cf;
+    --btn-warning:#fdc8a7;
+    --form-input:#fd6fa6;
+    --form-task: #ffff;
+    --form-input-task:#ffff;
+    background-image: url("../assets/background.png");
+  }
+
+  .dark-theme{
+    --main-container-background:#6c99b9;
+    --footer-background: #8b5f70;
+    --text-container: #000;
+    --texte-dark: #ffffff;
+    --text-ligneH-container:#6c99b9;
+    --text-ligneV-container: #830334;
+    --sub-title: #8b5f70;
+    --text-light:#000;
+    --btn:#6c99b9;
+    --text-btn-primary:#000;
+    --btn-success:#830334;
+    --btn-success-hover:#649482;
+    --title-app : #ffffff;
+    --main-title: #ffffff;
+    --question-title: #ffffff;
+    --question-background: #000;
+    --question-selected:#830334;
+    --question-instruction: #000;
+    --question-hover: #8b5f70;
+    --btn-primary:#000;
+    --calendar-active:#830334;
+    --color-title:#830334;
+    --calendar-day:#000;
+    --calendar-daygrid-day:#8b5f70;
+    --success-background:#37554a;
+    --btn-warning:#c44b00;
+    --form-input:#830334;
+    --form-task: #8b5f70;
+    --form-input-task: #830334;
+    background-image: url("../assets/dark-background.png");
+  }
+
+  .lavanda-theme{
+   
+    --main-container-background:#f5e6e8;
+    --footer-background: #d8b4f8;
+    --text-container: #e6e6fa;
+    --texte-dark: #000;
+    --text-ligneH-container:#8d76a1;
+    --text-ligneV-container: #830334;
+    --sub-title: #d8b4f8;
+    --text-light:#d8d8d8;
+    --btn:#8d76a1;
+    --text-btn-primary:#000;
+    --btn-success:#d8b4f8;
+    --btn-success-hover:#e6e6fa;
+    --title-app : #ffffff;
+    --main-title: #8d76a1;
+    --question-title: #8d76a1;
+    --question-background: #d8d8d8;
+    --question-selected: #ffffff;
+    --question-instruction: #000;
+    --question-hover: #d8b4f8;
+    --btn-primary:#d8b4f8;
+    --calendar-active:#8d76a1;
+    --color-title:#8d76a1;
+    --calendar-day:#d8b4f8;
+    --calendar-daygrid-day:#e6e6fa;
+    --success-background:#61aa8f;
+    --btn-warning:#fdc8a7;
+    --form-input:#000;
+    --form-task: #8d76a1;
+    --form-input-task: #000;
+    background-image: url("../assets/lavanda-background.png");
+  }
