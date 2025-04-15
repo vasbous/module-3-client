@@ -11,6 +11,15 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
   const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
   const MAX_HISTORY = 30; // Set maximum history length to 30
+  const inputRef = useRef(null);
+
+  // Voice recognition states and refs
+  const [isRecording, setIsRecording] = useState(false);
+  const [hasRecordingPermission, setHasRecordingPermission] = useState(false);
+  const [permissionAsked, setPermissionAsked] = useState(false);
+  const recognitionRef = useRef(null);
+  const speechSynthesisRef = useRef(null);
+  const lastUserInputWasVoice = useRef(false);
 
   // Load chat history from user profile when component mounts or currentUser changes
   useEffect(() => {
@@ -25,7 +34,6 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
         user: msg.user_message,
         bot: msg.ai_message,
       }));
-
       setMessages(loadedMessages);
     } else {
       // Add welcome message if no history exists
@@ -38,6 +46,63 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
     }
   }, [currentUser]);
 
+  // Initialize speech recognition and synthesis
+  useEffect(() => {
+    // Check if the browser supports SpeechRecognition
+    if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = "en-US";
+
+      recognitionRef.current.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript);
+        // Auto-submit after a short delay to allow user to see what was transcribed
+        setTimeout(() => {
+          handleSubmit({ preventDefault: () => {} });
+        }, 500);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsRecording(false);
+      };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error("Speech recognition error", event.error);
+        setIsRecording(false);
+        setError("Sorry, I couldn't understand that. Please try again.");
+      };
+    }
+
+    // Initialize speech synthesis
+    if ("speechSynthesis" in window) {
+      speechSynthesisRef.current = window.speechSynthesis;
+    }
+
+    // Check if we already have microphone permission
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then(() => {
+        setHasRecordingPermission(true);
+      })
+      .catch(() => {
+        setHasRecordingPermission(false);
+      });
+
+    return () => {
+      // Clean up
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+      if (speechSynthesisRef.current) {
+        speechSynthesisRef.current.cancel();
+      }
+    };
+  }, []);
+
   // Auto-scroll to bottom of chat when messages change
   useEffect(() => {
     scrollToBottom();
@@ -47,7 +112,76 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const startRecording = () => {
+    if (!recognitionRef.current) {
+      setError("Your browser doesn't support voice recognition");
+      return;
+    }
+
+    if (!hasRecordingPermission && !permissionAsked) {
+      // Ask for microphone permission
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then(() => {
+          setHasRecordingPermission(true);
+          setPermissionAsked(true);
+          setIsRecording(true);
+          recognitionRef.current.start();
+        })
+        .catch((err) => {
+          console.error("Error getting microphone permission:", err);
+          setError("Please enable microphone access to use voice input");
+          setPermissionAsked(true);
+        });
+    } else if (hasRecordingPermission) {
+      setIsRecording(true);
+      recognitionRef.current.start();
+    }
+
+    lastUserInputWasVoice.current = true;
+  };
+
+  const stopRecording = () => {
+    if (recognitionRef.current && isRecording) {
+      recognitionRef.current.stop();
+    }
+  };
+
+  const speakText = (text) => {
+    if (!speechSynthesisRef.current) {
+      console.error("Speech synthesis not supported");
+      return;
+    }
+
+    // Cancel any ongoing speech
+    speechSynthesisRef.current.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.5;
+    utterance.pitch = 1.0;
+
+    // Find a good voice if available
+    const voices = speechSynthesisRef.current.getVoices();
+    const preferredVoice = voices.find(
+      (voice) =>
+        voice.name.includes("Google") ||
+        voice.name.includes("Microsoft") ||
+        voice.name.includes("Female") ||
+        voice.name.includes("Samantha")
+    );
+
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+
+    speechSynthesisRef.current.speak(utterance);
+  };
+
   const generateGeminiPrompt = (userMessage) => {
+    // Get current date in user-friendly format
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString();
+
     // Extract goal details and task information from user
     const goalDetails = currentUser?.goal_details || {};
     const selectedGoal = goalDetails.selectedGoal || "No specific goal set";
@@ -66,9 +200,9 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
         .join("\n");
     }
 
-    // Format conversation history (limit to last 5 exchanges)
+    // Format conversation history (limit to last 10 exchanges)
     const recentMessages = messages
-      .slice(-5)
+      .slice(-10)
       .map((msg) => {
         return `${msg.user ? "User: " + msg.user : ""}${
           msg.bot ? "\nAssistant: " + msg.bot : ""
@@ -77,31 +211,36 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
       .join("\n\n");
 
     return `
-    You are a friendly, concise life coach assistant helping a user with their personal development journey.
-    
-    USER INFORMATION:
-    Goal: ${selectedGoal}
-    User's Tasks: ${planTasks}
-    Goal-Related Questions & Answers: ${
+You are a friendly, concise life coach assistant helping a user with their personal development journey.
+
+TODAY'S DATE: ${formattedDate}
+
+USER INFORMATION:
+Goal: ${selectedGoal}
+
+User's Tasks: ${planTasks}
+
+Goal-Related Questions & Answers: ${
       questionsAndAnswers || "No specific questions answered yet"
     }
-    
-    CONVERSATION CONTEXT:
-    ${recentMessages}
-    
-    USER'S CURRENT QUESTION: ${userMessage}
-    
-    Guidelines for your response:
-    1. Keep answers concise - between one line and a short paragraph
-    2. Be supportive, empathetic, and motivational
-    3. Focus specifically on the user's goal and planned tasks when relevant
-    4. If you need clarification to give a good answer, ask ONE brief follow-up question
-    5. Don't introduce yourself or use unnecessary pleasantries - just answer directly
-    6. If asked about tasks, provide specific implementation advice when possible
-    7. Maintain a warm, personal coaching style
-    
-    Respond conversationally as if you're a supportive coach:
-    `;
+
+CONVERSATION CONTEXT:
+${recentMessages}
+
+USER'S CURRENT QUESTION: ${userMessage}
+
+Guidelines for your response:
+1. Keep answers concise - between one line and a short paragraph
+2. Be supportive, empathetic, and motivational
+3. Focus specifically on the user's goal and planned tasks when relevant
+4. If you need clarification to give a good answer, ask ONE brief follow-up question
+5. Don't introduce yourself or use unnecessary pleasantries - just answer directly
+6. If asked about tasks, provide specific implementation advice when possible
+7. Maintain a warm, personal coaching style
+8. Always refer to today's date as ${formattedDate} when discussing today's tasks
+
+Respond conversationally as if you're a supportive coach:
+`;
   };
 
   // Helper function to extract tasks from user's plan
@@ -194,6 +333,14 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
       // Add bot response to chat
       setMessages((prev) => [...prev, { id: prev.length, bot: botResponse }]);
 
+      // If the user input was voice, automatically speak the response
+      if (lastUserInputWasVoice.current) {
+        speakText(botResponse);
+      }
+
+      // Reset voice input flag
+      lastUserInputWasVoice.current = false;
+
       // Notify parent component about new message (for notification badge)
       if (onNewMessage) {
         onNewMessage();
@@ -248,6 +395,17 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
       setError("Failed to get a response. Please try again.");
     } finally {
       setLoading(false);
+      // Set focus back on input field after a short delay
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  };
+
+  // Play a specific message (for the play button on past messages)
+  const playMessage = (message) => {
+    if (message && speechSynthesisRef.current) {
+      speakText(message);
     }
   };
 
@@ -258,7 +416,6 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
           <h3>Life Coach Assistant</h3>
         </div>
       )}
-
       <div className="chatbot-messages">
         {messages.map((message) => (
           <React.Fragment key={message.id}>
@@ -270,6 +427,13 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
             {message.bot && (
               <div className="message bot-message">
                 <p>{message.bot}</p>
+                <button
+                  className="play-message-btn"
+                  onClick={() => playMessage(message.bot)}
+                  aria-label="Play message"
+                >
+                  <i className="fas fa-volume-up"></i>
+                </button>
               </div>
             )}
           </React.Fragment>
@@ -282,22 +446,34 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
         {error && <div className="error-message">{error}</div>}
         <div ref={messagesEndRef} />
       </div>
-
       <form onSubmit={handleSubmit} className="chatbot-input-container">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask about your goals or tasks..."
-          disabled={loading}
+          disabled={loading || isRecording}
           className="chatbot-input"
+          ref={inputRef}
         />
         <button
+          type="button"
+          className={`chatbot-mic-btn ${isRecording ? "recording" : ""}`}
+          onClick={isRecording ? stopRecording : startRecording}
+          disabled={loading}
+        >
+          <i
+            className={`fas ${isRecording ? "fa-stop" : "fa-microphone"} ${
+              isRecording ? "fa-beat" : ""
+            }`}
+          ></i>
+        </button>
+        <button
           type="submit"
-          disabled={loading || !input.trim()}
+          disabled={loading || !input.trim() || isRecording}
           className="chatbot-send-btn"
         >
-          <i className="fas fa-paper-plane"></i>
+          <i className="fas fa-paper-plane fa-beat"></i>
         </button>
       </form>
     </div>
