@@ -8,33 +8,12 @@ import { API_URL } from "../config/config";
 export const FloatingChatbot = () => {
   const { currentUser, isLoggedIn, refetchUser } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [hasShownWelcome, setHasShownWelcome] = useState(false);
-  const [lastReadTimestamp, setLastReadTimestamp] = useState(null);
 
-  // Load chatbot state and last read timestamp from localStorage on component mount
+  // Load chatbot state from localStorage on component mount
   useEffect(() => {
     const savedState = localStorage.getItem("chatbotState");
     if (savedState) {
       setIsOpen(JSON.parse(savedState));
-    }
-
-    // Load last read timestamp
-    if (currentUser) {
-      const savedTimestamp = localStorage.getItem(
-        `${currentUser._id}_lastReadTimestamp`
-      );
-      if (savedTimestamp) {
-        setLastReadTimestamp(parseInt(savedTimestamp));
-      } else {
-        // If no timestamp exists, set it to now
-        const now = new Date().getTime();
-        setLastReadTimestamp(now);
-        localStorage.setItem(
-          `${currentUser._id}_lastReadTimestamp`,
-          now.toString()
-        );
-      }
     }
 
     // Listen for the custom openChatbot event
@@ -49,88 +28,101 @@ export const FloatingChatbot = () => {
     };
   }, [currentUser]);
 
-  // First-time visitor welcome message
+  // Welcome message based on welcome_message field in user profile
   useEffect(() => {
-    // Check if this is the first visit to dashboard specifically
-    const isFirstDashboardVisit = !localStorage.getItem("hasVisitedDashboard");
-
+    // Check if user hasn't seen the welcome message before (welcome_message is false)
     if (
-      isFirstDashboardVisit &&
-      window.location.pathname === "/dashboard" && // Only show welcome on dashboard
       currentUser &&
-      currentUser.plan &&
-      !hasShownWelcome
+      currentUser.welcome_message === false &&
+      window.location.pathname === "/dashboard" // Only show welcome on dashboard
     ) {
+      console.log("Welcome message status:", currentUser.welcome_message);
       // Set flag immediately to prevent multiple triggers
-      localStorage.setItem("hasVisitedDashboard", "true");
-      setHasShownWelcome(true);
 
-      // Set timeout to open chatbot after page loads
+      // Set timeout to open chatbot after 3 seconds
       const welcomeTimeout = setTimeout(() => {
         setIsOpen(true);
-        sendWelcomeMessage();
-      }, 1500); // Reduced slightly to ensure it happens before user interaction
+        // First update welcome_message to true in database
+        updateWelcomeMessageStatus().then(() => {
+          // Then send welcome message after status is updated
+          sendWelcomeMessage();
+        });
+      }, 3000); // 3 second delay as requested
 
       return () => clearTimeout(welcomeTimeout);
     }
   }, [currentUser, window.location.pathname]);
 
-  // Check for unread messages when user data changes
-  useEffect(() => {
-    if (currentUser && currentUser.chat_history) {
-      calculateUnreadMessages();
-    }
-  }, [currentUser, lastReadTimestamp]);
-
   // Save chatbot state to localStorage when it changes
   useEffect(() => {
     localStorage.setItem("chatbotState", JSON.stringify(isOpen));
-    // If chatbot is opened, mark all messages as read
-    if (isOpen && currentUser) {
-      const now = new Date().getTime();
-      setLastReadTimestamp(now);
-      localStorage.setItem(
-        `${currentUser._id}_lastReadTimestamp`,
-        now.toString()
-      );
-      setUnreadCount(0);
-    }
-  }, [isOpen, currentUser]);
-
-  const calculateUnreadMessages = () => {
-    if (!currentUser || !currentUser.chat_history || !lastReadTimestamp) return;
-
-    // Count messages that have a system/notification type (no user_message)
-    let unreadCount = 0;
-    currentUser.chat_history.forEach((msg) => {
-      if (!msg.user_message && msg.ai_message) {
-        // This indicates it's a notification/system message - count as unread
-        unreadCount++;
-      }
-    });
-
-    setUnreadCount(unreadCount);
-  };
+  }, [isOpen]);
 
   const toggleChatbot = () => {
     setIsOpen(!isOpen);
   };
 
-  const sendWelcomeMessage = async () => {
-    if (!currentUser || !currentUser._id) return;
+  // Function to update welcome_message status in database
+  const updateWelcomeMessageStatus = async () => {
+    if (!currentUser || !currentUser._id) {
+      console.log("No current user found, can't update welcome message");
+      return;
+    }
+
+    console.log(
+      "Attempting to update welcome_message for user:",
+      currentUser._id
+    );
 
     try {
-      // Format welcome message
+      // Call the API endpoint to update welcome_message
+      const response = await axios.patch(
+        `${API_URL}/user/update/welcome_message/${currentUser._id}`,
+        { welcome_message: true }, // Explicitly send the value we want to update to
+        {
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Welcome message update response:", response.data);
+
+      // Force refresh user data to update the welcome_message status locally
+      if (currentUser && currentUser._id) {
+        await refetchUser(currentUser._id);
+        console.log("User data refreshed after welcome message update");
+      }
+
+      return true;
+    } catch (error) {
+      console.error(
+        "Error updating welcome message status:",
+        error.response ? error.response.data : error.message
+      );
+      return false;
+    }
+  };
+
+  const sendWelcomeMessage = async () => {
+    if (!currentUser || !currentUser._id) {
+      console.log("No current user found, can't send welcome message");
+      return;
+    }
+
+    try {
+      // Format welcome message exactly as specified
       const welcomeMessage = `Welcome to your personal dashboard! 👋 I'm your Life Coach assistant and I'm here to help you achieve your goals. You can ask me about:
-
-\n\n
-- Your current tasks and goals\n
-- Tips for completing tasks effectively\n
-- Motivation when you're feeling stuck\n
-- Tracking your progress\n\n
-
+    
+- Your current tasks and goals
+- Tips for completing tasks effectively
+- Motivation when you're feeling stuck
+- Tracking your progress
+    
 Feel free to send me a message anytime you need assistance!`;
 
+      console.log("Fetching current chat history");
       // Get current chat history
       const userResponse = await axios.get(
         `${API_URL}/user/${currentUser._id}`,
@@ -142,6 +134,7 @@ Feel free to send me a message anytime you need assistance!`;
       );
 
       const currentChatHistory = userResponse.data.chat_history || [];
+      console.log("Current chat history length:", currentChatHistory.length);
 
       // Add the welcome message to chat history
       const newChatHistory = [
@@ -149,8 +142,9 @@ Feel free to send me a message anytime you need assistance!`;
         { user_message: "", ai_message: welcomeMessage },
       ];
 
+      console.log("Updating chat history with welcome message");
       // Update the database with new chat history
-      await axios.patch(
+      const response = await axios.patch(
         `${API_URL}/user/update/chat_history/${currentUser._id}`,
         {
           chat_history: newChatHistory,
@@ -163,19 +157,18 @@ Feel free to send me a message anytime you need assistance!`;
         }
       );
 
+      console.log("Chat history update response:", response.data);
+
       // Force a refetch of user data to show the welcome message in the chat
       if (currentUser && currentUser._id) {
         await refetchUser(currentUser._id);
+        console.log("User data refreshed after chat history update");
       }
     } catch (error) {
-      console.error("Error sending welcome message:", error);
-    }
-  };
-
-  // Handler for new messages from the Chatbot component
-  const handleNewMessage = () => {
-    if (!isOpen && currentUser) {
-      setUnreadCount((prevCount) => prevCount + 1);
+      console.error(
+        "Error sending welcome message:",
+        error.response ? error.response.data : error.message
+      );
     }
   };
 
@@ -195,15 +188,12 @@ Feel free to send me a message anytime you need assistance!`;
             </button>
           </div>
           <div className="chatbot-popup-content">
-            <Chatbot hideHeader={true} onNewMessage={handleNewMessage} />
+            <Chatbot hideHeader={true} />
           </div>
         </div>
       ) : (
         <button className="chatbot-toggle-button" onClick={toggleChatbot}>
           <i className="fas fa-comment"></i>
-          {unreadCount > 0 && (
-            <span className="notification-badge">{unreadCount}</span>
-          )}
         </button>
       )}
     </div>

@@ -6,17 +6,17 @@ import { AuthContext } from "../context/AuthContext";
 
 export const TaskDetailsModal = ({ isOpen, onClose, taskDetails }) => {
   if (!isOpen) return null;
-  const {currentUser, refetchUser} = useContext(AuthContext)
-  const {changeTaskPlan} = useContext(TaskContext)
-  console.log(taskDetails.taskId)
+  const { currentUser, refetchUser } = useContext(AuthContext);
+  const { changeTaskPlan } = useContext(TaskContext);
+  console.log(taskDetails.taskId);
   async function newTask() {
     const data = {
-       oldTaskId : taskDetails.taskId,
-       category: currentUser.goal_details.selectedGoal,
-       startDate : taskDetails.start,
-    }
+      oldTaskId: taskDetails.taskId,
+      category: currentUser.goal_details.selectedGoal,
+      startDate: taskDetails.start,
+    };
     await changeTaskPlan(data);
-    await refetchUser(currentUser._id)
+    await refetchUser(currentUser._id);
     onClose();
   }
   return (
@@ -31,14 +31,10 @@ export const TaskDetailsModal = ({ isOpen, onClose, taskDetails }) => {
         <div className="modal-body">
           <div className="modal-date">
             {taskDetails.start && (
-              <p>
-                {new Date(taskDetails.start).toLocaleString()}
-              </p>
+              <p>{new Date(taskDetails.start).toLocaleString()}</p>
             )}
             {taskDetails.end && (
-              <p>
-                {new Date(taskDetails.end).toLocaleString()}
-              </p>
+              <p>{new Date(taskDetails.end).toLocaleString()}</p>
             )}
           </div>
           {taskDetails.details && (
@@ -48,9 +44,11 @@ export const TaskDetailsModal = ({ isOpen, onClose, taskDetails }) => {
           )}
         </div>
         <div className="modal-footer">
-          <button className="btn btn-primary" onClick={newTask}>
-            Change this task
-          </button>
+          {!taskDetails.done && (
+            <button className="btn btn-primary" onClick={newTask}>
+              Change this task
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import "../css/calendar.css";
-import { TaskDetailsModal } from "../components/TaskDetailsModal"; 
+import { TaskDetailsModal } from "../components/TaskDetailsModal";
 
 export const DashBoardPage = () => {
   const { tasksOfTheDay, dailyTasks } = useContext(TaskContext);
@@ -18,12 +18,15 @@ export const DashBoardPage = () => {
   const [calendarEvents, setCalendarEvents] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [progressPercentage, setProgressPercentage] = useState(
+    (currentUser.progression / (currentUser.level + 1)) * 100
+  );
   useEffect(() => {
     if (currentUser.plan) {
       tasksOfTheDay();
     }
 
-    const events = currentUser?.plan?.tasks?.map((oneTask , key) => {
+    const events = currentUser?.plan?.tasks?.map((oneTask, key) => {
       const startDate = new Date(oneTask.startDate);
       const endDate = new Date(oneTask.endDate);
       // const hours = oneTask.time;
@@ -38,10 +41,12 @@ export const DashBoardPage = () => {
         done: oneTask.done,
         color: oneTask.done ? "#4CAF50" : "#f44336",
         details: oneTask.task.description,
-        taskId: oneTask.task._id
-        
+        taskId: oneTask.task._id,
       };
     });
+    setProgressPercentage(
+      (currentUser.progression / (currentUser.level + 1)) * 100
+    );
     setCalendarEvents(events);
   }, [currentUser]);
 
@@ -55,17 +60,15 @@ export const DashBoardPage = () => {
       details: task.extendedProps.details,
       done: task.extendedProps.done,
       id: task.id,
-      taskId:task.extendedProps.taskId
+      taskId: task.extendedProps.taskId,
     });
     setIsModalOpen(true);
-  };
+  }
 
   function closeModal() {
     setIsModalOpen(false);
     setSelectedTask(null);
-  };
-
-  
+  }
 
   return (
     <div className="container">
@@ -76,11 +79,11 @@ export const DashBoardPage = () => {
           events={calendarEvents || []}
           height="100%"
           locale="en-gb"
-          titleFormat={{ 
-            day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-                }}
+          titleFormat={{
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          }}
           eventTimeFormat={{
             hour: "2-digit",
             minute: "2-digit",
@@ -118,7 +121,19 @@ export const DashBoardPage = () => {
             <DiaryDashboard />
           </div>
           <div className="score-container">
-            <div className="dashboard-card">
+            <h3 className="text-center">LEVEL</h3>
+            <p className="text-center lvl-number">{currentUser.level}</p>
+            <div className="empty-progression-bar">
+              <div
+                className="progression-bar"
+                style={{
+                  width: `${progressPercentage}%`,
+                  transition: "width 0.5s ease-in-out",
+                }}
+              ></div>
+            </div>
+
+            {/* <div className="dashboard-card">
               <h3>Action Plan</h3>
               <p>
                 Create a personalized 30-day action plan to achieve your goals
@@ -138,16 +153,15 @@ export const DashBoardPage = () => {
                   Create Your Plan
                 </Link>
               )}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
-      <TaskDetailsModal 
-        isOpen={isModalOpen} 
-        onClose={closeModal} 
-        taskDetails={selectedTask || {}} 
+      <TaskDetailsModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        taskDetails={selectedTask || {}}
       />
     </div>
-    
   );
 };

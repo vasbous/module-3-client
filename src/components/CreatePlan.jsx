@@ -35,76 +35,6 @@ export const CreatePlan = () => {
     fetchGoalTasks();
   }, [currentUser]);
 
-  const allTasksLibraryString = JSON.stringify(allGoalTasks, null, 2);
-
-  const generateGeminiPrompt = () => {
-    // Extract goal details from user
-    const goalDetails = currentUser.goal_details || {};
-    const selectedGoal = goalDetails.selectedGoal || "No specific goal set";
-
-    // Format goal-related questions and answers
-    let questionsAndAnswers = "";
-    if (goalDetails.questions && goalDetails.questions.length > 0) {
-      questionsAndAnswers = goalDetails.questions
-        .map(
-          (q) =>
-            `Question: ${q.question || q.title}\nAnswer: ${
-              q.user_answer || "Not answered"
-            }`
-        )
-        .join("\n");
-    }
-
-    // Get current date and calculate one month from now
-    const startDate = new Date();
-    const endDate = new Date();
-    endDate.setMonth(endDate.getMonth() + 1);
-
-    return `
-You are an AI life coach creating a personalized action plan for a user. Below is the user information:
-
-User Goal: ${selectedGoal}
-
-Relevant Questions & User's Answers:
-${questionsAndAnswers || "No specific questions answered yet"}
-
-IMPORTANT: Instead of creating new tasks, you MUST select tasks ONLY from the provided task library below:
-${allTasksLibraryString}
-
-Create a 30-day action plan by selecting appropriate tasks from the library. Your plan should help the user achieve their goal progressively.
-
-Your response should be in valid JSON format with the following structure:
-
-{
-  "plan": {
-    "start_date": "${startDate.toISOString().split("T")[0]}",
-    "end_date": "${endDate.toISOString().split("T")[0]}"
-  },
-  "tasks": [
-    {
-      "task":ObjectId(id)
-      "startDate": YYYY-MM-DDTHH:mm,
-      "endDate": YYYY-MM-DDTHH:mm,
-    },
-    // More tasks...
-  ]
-}
-
-Guidelines:
-1. Using the  1-3 tasks per day spread over the next month according to user answer about available days of the week.
-2. Ensure tasks are specific, actionable, and directly related to the user's goal
-3. Do not repeat the same tasks if more options are available or at least don't repeat them too close together.
-4. If you schedule an easy or quick task, also assign another task on that day.
-5. Schedule tasks at times that align with the user's preferences from their answers, as well as enough tasks to cover the user's available time.
-6. Ensure each task's duration is reasonable (5-90 minutes).
-7. Avoid scheduling tasks too close together on the same day
-8. Your response MUST be valid JSON only, with no additional text or explanations
-9. YOU MUST ONLY SELECT TASKS FROM THE PROVIDED LIBRARY - do not create new tasks
-
-IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
-`;
-  };
-
   const getAIPlan = async () => {
     try {
       // Prepare the data to send to the backend
@@ -112,7 +42,6 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
         currentUser,
         allGoalTasks,
       };
-
       console.log("Sending data to backend for plan generation:", requestData);
 
       // Call the backend endpoint
@@ -150,53 +79,130 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
       // Get AI generated plan
       const planData = await getAIPlan();
 
-      // First create the plan with start and end dates
-      const planResponse = await axios.post(`${API_URL}/plan`, planData.plan, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      // Check if user already has a plan
+      if (currentUser?.plan) {
+        // Get current date
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-      const createdPlan = planResponse.data;
-      console.log("Created plan:", createdPlan);
+        // Get existing plan
+        const existingPlan = currentUser.plan;
 
-      // Format tasks with task IDs, startDate, endDate, and done status
-      const formattedTasks = planData.tasks.map((task) => ({
-        task: task.task, // This should already be the ObjectId of the task
-        startDate: new Date(task.startDate),
-        endDate: new Date(task.endDate),
-        done: false,
-      }));
+        // Find if user has completed today's tasks
+        // First get today's tasks
+        const todayTasks = await axios.get(
+          `${API_URL}/plan/tasks/${
+            existingPlan._id
+          }?date=${today.toISOString()}`,
+          {
+            headers: {
+              authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
 
-      // Update the plan with the tasks
-      await axios.patch(
-        `${API_URL}/plan/${createdPlan._id}`,
-        { tasks: formattedTasks },
-        {
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            "Content-Type": "application/json",
-          },
+        // Check if all of today's tasks are done
+        const allTasksDone =
+          todayTasks.data.length > 0 &&
+          todayTasks.data.every((task) => task.done === true);
+
+        // Set start date for new tasks
+        let newTasksStartDate = new Date();
+        if (allTasksDone) {
+          // If today's tasks are done, start from tomorrow
+          newTasksStartDate.setDate(newTasksStartDate.getDate() + 1);
         }
-      );
+        newTasksStartDate.setHours(0, 0, 0, 0);
 
-      // Update user with the plan ID
-      await axios.patch(
-        `${API_URL}/user/update/plan/${currentUser._id}`,
-        { plan: createdPlan._id },
-        {
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            "Content-Type": "application/json",
+        // Set end date one month from new tasks start date
+        const newEndDate = new Date(newTasksStartDate);
+        newEndDate.setMonth(newEndDate.getMonth() + 1);
+
+        // Filter out existing tasks that are in the past or today (if today's tasks are not all done)
+        const pastTasks = existingPlan.tasks.filter((task) => {
+          const taskStartDate = new Date(task.startDate);
+          return taskStartDate < newTasksStartDate;
+        });
+
+        // Format new tasks
+        const newTasks = planData.tasks.map((task) => ({
+          task: task.task,
+          startDate: new Date(task.startDate),
+          endDate: new Date(task.endDate),
+          done: false,
+        }));
+
+        // Combine past tasks with new tasks
+        const combinedTasks = [...pastTasks, ...newTasks];
+
+        // Update plan with new end date and combined tasks
+        await axios.patch(
+          `${API_URL}/plan/${existingPlan._id}`,
+          {
+            end_date: newEndDate,
+            tasks: combinedTasks,
           },
-        }
-      );
+          {
+            headers: {
+              authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } else {
+        // No existing plan, create a new one
+        // First create the plan with start and end dates
+        const planResponse = await axios.post(
+          `${API_URL}/plan`,
+          planData.plan,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const createdPlan = planResponse.data;
+        console.log("Created plan:", createdPlan);
+
+        // Format tasks with task IDs, startDate, endDate, and done status
+        const formattedTasks = planData.tasks.map((task) => ({
+          task: task.task, // This should already be the ObjectId of the task
+          startDate: new Date(task.startDate),
+          endDate: new Date(task.endDate),
+          done: false,
+        }));
+
+        // Update the plan with the tasks
+        await axios.patch(
+          `${API_URL}/plan/${createdPlan._id}`,
+          { tasks: formattedTasks },
+          {
+            headers: {
+              authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        // Update user with the plan ID
+        await axios.patch(
+          `${API_URL}/user/update/plan/${currentUser._id}`,
+          { plan: createdPlan._id },
+          {
+            headers: {
+              authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
 
       // Refresh user data
       await refetchUser(currentUser._id);
 
       // Show success notification
-      setNotification("Your plan has been successfully created!");
+      setNotification("Your plan has been successfully updated!");
 
       // Navigate after a delay to let user see the notification
       setTimeout(() => {
@@ -225,7 +231,6 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
     <div className="container create-plan-container">
       <h2 className="create-plan-title">Create Your Monthly Action Plan</h2>
       {error && <div className="create-plan-error">{error}</div>}
-
       <div className="plan-info">
         <h3>
           Goal: {currentUser?.goal_details?.selectedGoal || "No goal selected"}
@@ -236,7 +241,6 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
           answers to the questions and any previous tasks you've completed.
         </p>
       </div>
-
       <div className="plan-actions">
         <button
           className="btn"
@@ -253,26 +257,31 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
           {submitting ? "Creating Your Plan..." : "Generate My Plan"}
         </button>
       </div>
-
       {submitting && (
         <div className="loading-message">
+          <div className="typewriter">
+            <div className="slide">
+              <i></i>
+            </div>
+            <div className="paper"></div>
+            <div className="keyboard"></div>
+          </div>
           <p>
             Generating your customized plan... This may take a moment as we're
             creating personalized tasks based on your goal and preferences.
           </p>
         </div>
       )}
-
       {notification && (
         <div className="success-notification">{notification}</div>
       )}
-
       {showConfirmation && (
         <div className="confirmation-dialog">
           <div className="confirmation-content">
             <p>
-              Creating a new plan will replace your existing plan. Are you sure
-              you want to continue?
+              Creating a new plan will update your existing plan. All completed
+              tasks will be preserved, and new tasks will be added for the next
+              month. Are you sure you want to continue?
             </p>
             <div className="confirmation-actions">
               <button
@@ -288,7 +297,7 @@ IMPORTANT: Return ONLY the JSON object with no additional explanation or text.
                   handleCreatePlan(e);
                 }}
               >
-                Replace Plan
+                Update Plan
               </button>
             </div>
           </div>

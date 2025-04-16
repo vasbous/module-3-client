@@ -8,23 +8,33 @@ import { API_URL } from "../config/config";
 const TaskContext = createContext();
 
 const TaskContextWrapper = ({ children }) => {
-  const { currentUser, refetchUser } = useContext(AuthContext);
+  const { currentUser, refetchUser, lvlProgression } = useContext(AuthContext);
   const [dailyTasks, setDailyTasks] = useState("");
 
-  //   toggle check task
   async function doneTask(taskToUpdate) {
-    if (dayjs(taskToUpdate.startDate).isBefore(dayjs(), "day")) {
-      alert("can't done previous day tasks");
+    // Vérification si la tâche est d'un jour antérieur
+    if (
+      dayjs(taskToUpdate.startDate).isBefore(dayjs(), "day") ||
+      dayjs(taskToUpdate.startDate).isAfter(dayjs(), "day")
+    ) {
+      toast.error("can't done previous or futur day tasks");
       return; // stop the submit
     }
+
     try {
+      let taskCompleted = false;
       const updatedTasks = currentUser.plan.tasks.map((task) => {
         if (
           task.task._id === taskToUpdate.task._id &&
           new Date(task.startDate).toISOString() ===
             new Date(taskToUpdate.startDate).toISOString()
         ) {
-          return { ...task, done: !task.done }; // toggle done status
+          if (task.done) {
+            return task;
+          }
+          taskCompleted = true;
+          toast.success("Task Completed! Good Job!!!");
+          return { ...task, done: true };
         }
         return task;
       });
@@ -32,8 +42,13 @@ const TaskContextWrapper = ({ children }) => {
       await axios.patch(`${API_URL}/plan/${currentUser.plan._id}`, {
         tasks: updatedTasks,
       });
-
-      await refetchUser(currentUser._id);
+      if (taskCompleted) {
+        const up = await lvlProgression();
+        console.log(up);
+        return up;
+      } else {
+        refetchUser(currentUser._id);
+      }
     } catch (err) {
       console.error(err);
     }

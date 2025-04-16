@@ -4,7 +4,7 @@ import axios from "axios";
 import "../css/Chatbot.css";
 import { API_URL } from "../config/config";
 
-export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
+export const Chatbot = ({ hideHeader = false }) => {
   const { currentUser, refetchUser } = useContext(AuthContext);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -21,8 +21,9 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
   const recognitionRef = useRef(null);
   const speechSynthesisRef = useRef(null);
   const lastUserInputWasVoice = useRef(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
-  // Load chat history from user profile when component mounts or currentUser changes
+  // Load messages from user's chat history
   useEffect(() => {
     if (
       currentUser &&
@@ -36,14 +37,6 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
         bot: msg.ai_message,
       }));
       setMessages(loadedMessages);
-    } else {
-      // Add welcome message if no history exists
-      setMessages([
-        {
-          id: 0,
-          bot: "Hi there! I'm your Life Coach assistant. How can I help you today with your goals or tasks?",
-        },
-      ]);
     }
   }, [currentUser]);
 
@@ -61,9 +54,12 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
       recognitionRef.current.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         setInput(transcript);
+
         // Auto-submit after a short delay to allow user to see what was transcribed
         setTimeout(() => {
-          handleSubmit({ preventDefault: () => {} });
+          // Create a synthetic event and call handleSubmit directly
+          const syntheticEvent = { preventDefault: () => {} };
+          handleSubmit(syntheticEvent);
         }, 500);
       };
 
@@ -81,6 +77,11 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
     // Initialize speech synthesis
     if ("speechSynthesis" in window) {
       speechSynthesisRef.current = window.speechSynthesis;
+
+      // Add event listener for speech synthesis end
+      speechSynthesisRef.current.onend = () => {
+        setIsSpeaking(false);
+      };
     }
 
     // Check if we already have microphone permission
@@ -110,7 +111,7 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
   }, [messages]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "auto" }); // change 'smooth' to 'auto'
   };
 
   const startRecording = () => {
@@ -175,94 +176,15 @@ export const Chatbot = ({ hideHeader = false, onNewMessage }) => {
       utterance.voice = preferredVoice;
     }
 
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+    };
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+    };
+
     speechSynthesisRef.current.speak(utterance);
-  };
-
-  const generateGeminiPrompt = (userMessage) => {
-    // Get current date in user-friendly format
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString();
-
-    // Extract goal details and task information from user
-    const goalDetails = currentUser?.goal_details || {};
-    const selectedGoal = goalDetails.selectedGoal || "No specific goal set";
-    const planTasks = extractTasksFromPlan();
-
-    // Format goal-related questions and answers
-    let questionsAndAnswers = "";
-    if (goalDetails.questions && goalDetails.questions.length > 0) {
-      questionsAndAnswers = goalDetails.questions
-        .map(
-          (q) =>
-            `Question: ${q.question || q.title}\nAnswer: ${
-              q.user_answer || "Not answered"
-            }`
-        )
-        .join("\n");
-    }
-
-    // Format conversation history (limit to last 10 exchanges)
-    const recentMessages = messages
-      .slice(-10)
-      .map((msg) => {
-        return `${msg.user ? "User: " + msg.user : ""}${
-          msg.bot ? "\nAssistant: " + msg.bot : ""
-        }`;
-      })
-      .join("\n\n");
-
-    return `
-You are a friendly, concise life coach assistant helping a user with their personal development journey.
-
-TODAY'S DATE: ${formattedDate}
-
-USER INFORMATION:
-Goal: ${selectedGoal}
-
-User's Tasks: ${planTasks}
-
-Goal-Related Questions & Answers: ${
-      questionsAndAnswers || "No specific questions answered yet"
-    }
-
-CONVERSATION CONTEXT:
-${recentMessages}
-
-USER'S CURRENT QUESTION: ${userMessage}
-
-Guidelines for your response:
-1. Keep answers concise - between one line and a short paragraph
-2. Be supportive, empathetic, and motivational
-3. Focus specifically on the user's goal and planned tasks when relevant
-4. If you need clarification to give a good answer, ask ONE brief follow-up question
-5. Don't introduce yourself or use unnecessary pleasantries - just answer directly
-6. If asked about tasks, provide specific implementation advice when possible
-7. Maintain a warm, personal coaching style
-8. Always refer to today's date as ${formattedDate} when discussing today's tasks
-
-Respond conversationally as if you're a supportive coach:
-`;
-  };
-
-  // Helper function to extract tasks from user's plan
-  const extractTasksFromPlan = () => {
-    if (!currentUser || !currentUser.plan || !currentUser.plan.tasks) {
-      return "No tasks in current plan";
-    }
-
-    return currentUser.plan.tasks
-      .map((taskItem) => {
-        const taskDetails = taskItem.task;
-        if (taskDetails) {
-          const startDate = new Date(taskItem.startDate).toLocaleDateString();
-          return `Task: ${taskDetails.content} (${startDate}) - ${
-            taskItem.done ? "Completed" : "Pending"
-          }`;
-        }
-        return null;
-      })
-      .filter(Boolean)
-      .join("\n");
   };
 
   const getAIResponse = async (userMessage) => {
@@ -323,11 +245,6 @@ Respond conversationally as if you're a supportive coach:
       // Reset voice input flag
       lastUserInputWasVoice.current = false;
 
-      // Notify parent component about new message (for notification badge)
-      if (onNewMessage) {
-        onNewMessage();
-      }
-
       // Save to user's chat history in database
       if (currentUser && currentUser._id) {
         try {
@@ -382,9 +299,16 @@ Respond conversationally as if you're a supportive coach:
     }
   };
 
-  // Play a specific message (for the play button on past messages)
-  const playMessage = (message) => {
-    if (message && speechSynthesisRef.current) {
+  // Play or pause a specific message
+  const togglePlayback = (message) => {
+    if (!speechSynthesisRef.current) return;
+
+    if (isSpeaking) {
+      // If speaking, pause the speech
+      speechSynthesisRef.current.cancel();
+      setIsSpeaking(false);
+    } else {
+      // If not speaking, play the message
       speakText(message);
     }
   };
@@ -409,10 +333,14 @@ Respond conversationally as if you're a supportive coach:
                 <p>{message.bot}</p>
                 <button
                   className="play-message-btn"
-                  onClick={() => playMessage(message.bot)}
-                  aria-label="Play message"
+                  onClick={() => togglePlayback(message.bot)}
+                  aria-label={isSpeaking ? "Pause message" : "Play message"}
                 >
-                  <i className="fas fa-volume-up"></i>
+                  <i
+                    className={`fas ${
+                      isSpeaking ? "fa-pause" : "fa-volume-up"
+                    }`}
+                  ></i>
                 </button>
               </div>
             )}

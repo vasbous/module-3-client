@@ -10,7 +10,6 @@
   font-style: normal;
 }
 body {
-  
   background-size: cover;
   /* background: linear-gradient(
     20deg,
@@ -21,13 +20,11 @@ body {
   min-height: 100vh;
 }
 
-
 footer {
   height: 12vh;
   border-radius: 5px 5px 0px 0px;
   background: var(--footer-background);
 }
-
 
 /* CONTAINER */
 .container {
@@ -43,6 +40,7 @@ footer {
   justify-content: center;
   align-items: center;
   gap: 10px;
+  overflow: auto;
 }
 .profil-container,
 .form-container,
@@ -90,6 +88,7 @@ footer {
   color: var(--texte-dark);
   background: var(--text-container);
   border-radius: 15px;
+  overflow: auto;
   background-image: repeating-linear-gradient(
       to bottom,
       transparent,
@@ -115,7 +114,7 @@ footer {
   margin: 5px;
 }
 .daily-task-title-container h3 {
-  color: var( --sub-title);
+  color: var(--sub-title);
 }
 
 /* TaskPage */
@@ -200,11 +199,10 @@ footer {
   background-color: var(--btn-success-hover);
   border: 1px solid var(--btn-success-hover);
 }
-.btn-info{
+.btn-info {
   background-color: var(--btn-success-hover);
   border: 1px solid var(--btn-success-hover);
 }
-
 
 /* TEXT OPTION */
 .text-center {
@@ -357,7 +355,7 @@ a {
 
 .option-card.selected {
   background-color: var(--question-selected);
-  border: 2px solid var( --question-title);
+  border: 2px solid var(--question-title);
 }
 
 .navigation-buttons {
@@ -374,7 +372,42 @@ a {
   align-items: center;
   height: 60vh;
   font-size: 1.5rem;
-  color: var( --question-title);
+  color: var(--question-title);
+}
+
+/* level dashboard */
+.score-container,
+.score-container-profil {
+  padding: 5px 10px;
+}
+
+.empty-progression-bar {
+  width: 100%;
+  height: 24px;
+  background-color: var(--text-light);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progression-bar {
+  height: 100%;
+  background-color: var(--color-title);
+  border-radius: 12px;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  min-width: 32px;
+  transition: width 0.5s ease-in-out;
+}
+
+.lvl-number {
+  font-size: 2rem;
+  color: var(--text-light);
+  font-weight: bold;
+  margin: 0.5rem 0;
 }
 
 @media only screen and (min-width: 680px) {
@@ -424,7 +457,7 @@ a {
     backdrop-filter: blur(5.3px);
     -webkit-backdrop-filter: blur(5.3px);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    color: var( --question-title);
+    color: var(--question-title);
   }
   .previous-daily-task {
     border-radius: 25px 0px 0px 25px;
@@ -453,5 +486,4 @@ a {
   .goals-grid {
     grid-template-columns: 1fr;
   }
-
 }

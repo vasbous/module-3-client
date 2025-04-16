@@ -1,23 +1,34 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { ThemeContext } from "../context/ThemeContext";
 import dayjs from "dayjs";
 import "../css/profil.css";
 import { ProfilFormModal } from "../components/ProfilFormModal";
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
 
 export const ProfilPage = () => {
   const { currentUser, refetchUser, updateUserPlan } = useContext(AuthContext);
   const { theme, setTheme } = useContext(ThemeContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [property, setProperty] = useState("");
+  const [progressPercentage, setProgressPercentage] = useState(
+    (currentUser.progression / (currentUser.level + 1)) * 100
+  );
+
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      "--progress-percentage",
+      `${progressPercentage}%`
+    );
+  }, [progressPercentage]);
+
   function closeModal() {
     setIsModalOpen(false);
     setProperty("");
   }
   const handleChange = (e) => {
     setTheme(e.target.value);
-    toast.success(`Theme selected ${e.target.value}`)
+    toast.success(`Theme selected ${e.target.value}`);
   };
 
   function openModalWithProperty(propertyName) {
@@ -115,6 +126,16 @@ export const ProfilPage = () => {
               </div>
             </label>
           </form>
+        </section>
+        <section className="score-container-profil">
+          <div className="circular-level-container">
+            <div className="circular-level-progress">
+              <div className="circular-level-inner">
+                <span className="lvl-number">{currentUser.level}</span>
+                <h3 className="text-center">LVL</h3>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
       <ProfilFormModal

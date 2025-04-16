@@ -3,6 +3,7 @@ import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { API_URL } from "../config/config";
+
 const AuthContext = createContext();
 
 const AuthContextWrapper = ({ children }) => {
@@ -65,7 +66,9 @@ const AuthContextWrapper = ({ children }) => {
       console.log("user was logged in", connexion.data);
       localStorage.setItem("authToken", connexion.data.authToken);
       await authenticateUser();
-      nav("/dashboard");
+      if (currentUser?.plan) {
+        nav("/dashboard");
+      }
     } catch (err) {
       // console.log(err);
       toast.error(err.response.data.message);
@@ -82,7 +85,7 @@ const AuthContextWrapper = ({ children }) => {
       if (response.status === 201) {
         localStorage.setItem("authToken", response.data.token);
         await authenticateUser();
-        nav("/dashboard");
+        // nav("/dashboard");
       } else {
         toast.error(response.data.message || "Signup failed");
       }
@@ -132,6 +135,49 @@ const AuthContextWrapper = ({ children }) => {
     }
   }
 
+  // update lvl and progression
+  async function lvlProgression() {
+    let lvl = currentUser.level;
+    let progression = currentUser.progression;
+    let up = false;
+    progression += 1;
+    if (progression > lvl) {
+      progression = 0;
+      lvl += 1;
+      up = true;
+      try {
+        await axios.patch(`${API_URL}/user/update/level/${currentUser._id}`, {
+          level: lvl,
+        });
+        toast.success(" + LVL UP + ");
+      } catch (err) {
+        toast.error(
+          err.response?.data?.message ||
+            "Something went wrong. Please try again."
+        );
+      }
+    } else {
+      progression += 1;
+    }
+    try {
+      await axios.patch(
+        `${API_URL}/user/update/progression/${currentUser._id}`,
+        { progression: progression }
+      );
+      refetchUser(currentUser._id);
+      if (up) {
+        // confetti here
+
+        return true;
+      }
+      return false;
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "Something went wrong. Please try again."
+      );
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -147,6 +193,7 @@ const AuthContextWrapper = ({ children }) => {
         refetchUser,
         updateUserPlan,
         updateUser,
+        lvlProgression,
       }}
     >
       {children}

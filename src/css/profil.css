@@ -11,6 +11,7 @@
 .theme-selector {
   display: flex;
   align-items: center;
+  flex: wrap;
   gap: 30px;
   margin-top: 15px;
 }
@@ -48,35 +49,86 @@
   margin-left: 8px;
 }
 
-
 .default-primary {
-  background-color: #a7d3f3; 
+  background-color: #a7d3f3;
 }
 .default-secondary {
-  background-color: #f8afcb; 
+  background-color: #f8afcb;
 }
 .default-accent {
-  background-color: #a8e6cf; 
+  background-color: #a8e6cf;
 }
-
 
 .dark-primary {
-  background-color: #6c99b9; 
+  background-color: #6c99b9;
 }
 .dark-secondary {
-  background-color: #000; 
+  background-color: #000;
 }
 .dark-accent {
-  background-color: #830334; 
+  background-color: #830334;
 }
-
 
 .lavanda-primary {
-  background-color: #f5e6e8; 
+  background-color: #f5e6e8;
 }
 .lavanda-secondary {
-  background-color: #d8b4f8; 
+  background-color: #d8b4f8;
 }
 .lavanda-accent {
-  background-color: #8d76a1; 
+  background-color: #8d76a1;
+}
+
+.circular-level-container {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.circular-level-progress {
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: transparent;
+  border: 4px solid var(--text-light);
+  box-sizing: border-box;
+  z-index: 4;
+}
+
+.circular-level-progress::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  background: linear-gradient(
+    0deg,
+    var(--progress) 0%,
+    var(--progress) var(--progress-percentage, 0%),
+    transparent var(--progress-percentage, 0%),
+    transparent 100%
+  );
+  /* background: linear-gradient(0deg, var(--dark-pink), var(--white)); */
+  z-index: -1;
+}
+
+.circular-level-inner {
+  width: 100px;
+  height: 100px;
+  background-color: var(--main-container-background);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.circular-level-inner .lvl-number {
+  font-size: 36px;
+  font-weight: bold;
+  color: var(--text-light);
 }
