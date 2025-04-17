@@ -17,21 +17,24 @@ export const SignupQuestionsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Debug state changes
-  useEffect(() => {
-    console.log("Current question index:", currentQuestionIndex);
-    console.log("Questions array:", questions);
-    console.log("Selected goal:", selectedGoal);
-    console.log("Current answers:", answers);
-  }, [currentQuestionIndex, questions, selectedGoal, answers]);
+  // useEffect(() => {
+  //   console.log("Current question index:", currentQuestionIndex);
+  //   console.log("Questions array:", questions);
+  //   console.log("Selected goal:", selectedGoal);
+  //   console.log("Current answers:", answers);
+  // }, [currentQuestionIndex, questions, selectedGoal, answers]);
 
   // Fetch goals on component mount
   useEffect(() => {
     const fetchGoals = async () => {
       try {
+        // console.log("start questions page");
         setIsLoading(true);
         const response = await axios.get(`${API_URL}/goal`);
+        // console.log(response.data);
         setGoals(response.data);
         setIsLoading(false);
+        // console.log("end loading");
       } catch (error) {
         console.error("Error fetching goals:", error);
         setIsLoading(false);
@@ -114,9 +117,9 @@ export const SignupQuestionsPage = () => {
 
     setSelectedGoal(goalName);
     const selectedGoalData = goals.find((goal) => goal.name === goalName);
-    console.log("Selected goal data:", selectedGoalData);
+    // console.log("Selected goal data:", selectedGoalData);
     if (selectedGoalData) {
-      console.log("Questions for goal:", selectedGoalData.questions);
+      // console.log("Questions for goal:", selectedGoalData.questions);
       setQuestions(selectedGoalData.questions || []);
     }
   };

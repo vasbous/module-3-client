@@ -154,7 +154,7 @@ Don't start with any preamble. Just provide the feedback in the three sections.
     try {
       // Get AI feedback for this entry
       const aiResponse = await getAIFeedback();
-      console.log(aiResponse);
+      // console.log(aiResponse);
       const diaryData = {
         content,
         mood_score: moodScore,

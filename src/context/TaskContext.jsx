@@ -44,7 +44,7 @@ const TaskContextWrapper = ({ children }) => {
       });
       if (taskCompleted) {
         const up = await lvlProgression();
-        console.log(up);
+        // console.log(up);
         return up;
       } else {
         refetchUser(currentUser._id);
@@ -78,7 +78,7 @@ const TaskContextWrapper = ({ children }) => {
 
         await refetchUser(currentUser._id);
       } catch (err) {
-        console.log("error delete task", err);
+        // console.log("error delete task", err);
       }
     }
   }

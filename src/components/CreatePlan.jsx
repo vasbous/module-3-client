@@ -42,7 +42,7 @@ export const CreatePlan = () => {
         currentUser,
         allGoalTasks,
       };
-      console.log("Sending data to backend for plan generation:", requestData);
+      // console.log("Sending data to backend for plan generation:", requestData);
 
       // Call the backend endpoint
       const response = await axios.post(
@@ -56,7 +56,7 @@ export const CreatePlan = () => {
         }
       );
 
-      console.log("Backend response for plan:", response.data);
+      // console.log("Backend response for plan:", response.data);
 
       // Return the plan data from the backend
       return response.data.planData;
@@ -163,7 +163,7 @@ export const CreatePlan = () => {
         );
 
         const createdPlan = planResponse.data;
-        console.log("Created plan:", createdPlan);
+        // console.log("Created plan:", createdPlan);
 
         // Format tasks with task IDs, startDate, endDate, and done status
         const formattedTasks = planData.tasks.map((task) => ({

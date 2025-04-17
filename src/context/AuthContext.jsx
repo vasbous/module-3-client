@@ -20,8 +20,10 @@ const AuthContextWrapper = ({ children }) => {
       setCurrentUser(null);
       setIsLoading(false);
       setIsLoggedIn(false);
+      // console.log("lol");
     } else {
       try {
+        // console.log(localStorage.getItem("authToken"));
         const responseFromVerifyRoute = await axios.get(
           `${API_URL}/auth/verify`,
           {
@@ -43,11 +45,12 @@ const AuthContextWrapper = ({ children }) => {
         setCurrentUser(null);
         setIsLoading(false);
         setIsLoggedIn(false);
+        localStorage.removeItem("authToken"); // Clear invalid token
       }
     }
   };
 
-  //make a useEffect so anytime the page reloads, we verigy the token again
+  //make a useEffect so anytime the page reloads, we verify the token again
   useEffect(() => {
     authenticateUser();
   }, []);
@@ -62,16 +65,47 @@ const AuthContextWrapper = ({ children }) => {
   async function loginUser(data) {
     try {
       const connexion = await axios.post(`${API_URL}/auth/login`, data);
-
-      console.log("user was logged in", connexion.data);
       localStorage.setItem("authToken", connexion.data.authToken);
-      await authenticateUser();
-      if (currentUser?.plan) {
-        nav("/dashboard");
+
+      // Get the token from localStorage to verify
+      const tokenFromLocalStorage = localStorage.getItem("authToken");
+
+      if (tokenFromLocalStorage) {
+        try {
+          const responseFromVerifyRoute = await axios.get(
+            `${API_URL}/auth/verify`,
+            {
+              headers: {
+                authorization: `Bearer ${tokenFromLocalStorage}`,
+              },
+            }
+          );
+
+          const currentUserData = await axios.get(
+            `${API_URL}/user/${responseFromVerifyRoute.data.payload._id}`
+          );
+
+          // Update the state
+          setCurrentUser(currentUserData.data);
+          setIsLoading(false);
+          setIsLoggedIn(true);
+
+          // Use the direct data for navigation decision
+          if (currentUserData.data.signupCompleted) {
+            nav("/dashboard");
+          } else {
+            nav("/signup-questions");
+          }
+        } catch (error) {
+          // console.log(error);
+          setCurrentUser(null);
+          setIsLoading(false);
+          setIsLoggedIn(false);
+        }
       }
     } catch (err) {
       // console.log(err);
-      toast.error(err.response.data.message);
+      toast.error(err?.response?.data?.message);
     }
   }
 
@@ -84,7 +118,10 @@ const AuthContextWrapper = ({ children }) => {
       });
       if (response.status === 201) {
         localStorage.setItem("authToken", response.data.token);
-        await authenticateUser();
+        const token = localStorage.getItem("authToken");
+        if (token) {
+          await loginUser(data);
+        }
         // nav("/dashboard");
       } else {
         toast.error(response.data.message || "Signup failed");
@@ -107,7 +144,7 @@ const AuthContextWrapper = ({ children }) => {
       // console.log(response)
       return response.data.userInDB;
     } catch (error) {
-      console.log(error.response?.data?.message);
+      // console.log(error.response?.data?.message);
       // console.error(error)
       toast.error(
         error.response?.data?.message ||
@@ -156,8 +193,6 @@ const AuthContextWrapper = ({ children }) => {
             "Something went wrong. Please try again."
         );
       }
-    } else {
-      progression += 1;
     }
     try {
       await axios.patch(

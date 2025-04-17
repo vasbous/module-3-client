@@ -36,7 +36,7 @@ export const FloatingChatbot = () => {
       currentUser.welcome_message === false &&
       window.location.pathname === "/dashboard" // Only show welcome on dashboard
     ) {
-      console.log("Welcome message status:", currentUser.welcome_message);
+      // console.log("Welcome message status:", currentUser.welcome_message);
       // Set flag immediately to prevent multiple triggers
 
       // Set timeout to open chatbot after 3 seconds
@@ -65,14 +65,14 @@ export const FloatingChatbot = () => {
   // Function to update welcome_message status in database
   const updateWelcomeMessageStatus = async () => {
     if (!currentUser || !currentUser._id) {
-      console.log("No current user found, can't update welcome message");
+      // console.log("No current user found, can't update welcome message");
       return;
     }
 
-    console.log(
-      "Attempting to update welcome_message for user:",
-      currentUser._id
-    );
+    // console.log(
+    //   "Attempting to update welcome_message for user:",
+    //   currentUser._id
+    // );
 
     try {
       // Call the API endpoint to update welcome_message
@@ -87,12 +87,12 @@ export const FloatingChatbot = () => {
         }
       );
 
-      console.log("Welcome message update response:", response.data);
+      // console.log("Welcome message update response:", response.data);
 
       // Force refresh user data to update the welcome_message status locally
       if (currentUser && currentUser._id) {
         await refetchUser(currentUser._id);
-        console.log("User data refreshed after welcome message update");
+        // console.log("User data refreshed after welcome message update");
       }
 
       return true;
@@ -107,7 +107,7 @@ export const FloatingChatbot = () => {
 
   const sendWelcomeMessage = async () => {
     if (!currentUser || !currentUser._id) {
-      console.log("No current user found, can't send welcome message");
+      // console.log("No current user found, can't send welcome message");
       return;
     }
 
@@ -122,7 +122,7 @@ export const FloatingChatbot = () => {
     
 Feel free to send me a message anytime you need assistance!`;
 
-      console.log("Fetching current chat history");
+      // console.log("Fetching current chat history");
       // Get current chat history
       const userResponse = await axios.get(
         `${API_URL}/user/${currentUser._id}`,
@@ -134,7 +134,7 @@ Feel free to send me a message anytime you need assistance!`;
       );
 
       const currentChatHistory = userResponse.data.chat_history || [];
-      console.log("Current chat history length:", currentChatHistory.length);
+      // console.log("Current chat history length:", currentChatHistory.length);
 
       // Add the welcome message to chat history
       const newChatHistory = [
@@ -142,7 +142,7 @@ Feel free to send me a message anytime you need assistance!`;
         { user_message: "", ai_message: welcomeMessage },
       ];
 
-      console.log("Updating chat history with welcome message");
+      // console.log("Updating chat history with welcome message");
       // Update the database with new chat history
       const response = await axios.patch(
         `${API_URL}/user/update/chat_history/${currentUser._id}`,
@@ -157,12 +157,12 @@ Feel free to send me a message anytime you need assistance!`;
         }
       );
 
-      console.log("Chat history update response:", response.data);
+      // console.log("Chat history update response:", response.data);
 
       // Force a refetch of user data to show the welcome message in the chat
       if (currentUser && currentUser._id) {
         await refetchUser(currentUser._id);
-        console.log("User data refreshed after chat history update");
+        // console.log("User data refreshed after chat history update");
       }
     } catch (error) {
       console.error(

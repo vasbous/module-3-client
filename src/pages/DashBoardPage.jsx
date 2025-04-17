@@ -24,24 +24,25 @@ export const DashBoardPage = () => {
   useEffect(() => {
     if (currentUser.plan) {
       tasksOfTheDay();
+      console.log(currentUser);
     }
 
     const events = currentUser?.plan?.tasks?.map((oneTask, key) => {
-      const startDate = new Date(oneTask.startDate);
-      const endDate = new Date(oneTask.endDate);
+      const startDate = new Date(oneTask?.startDate);
+      const endDate = new Date(oneTask?.endDate);
       // const hours = oneTask.time;
       // date.setHours(hours, 0, 0, 0)
       // console.log(oneTask)
       return {
-        title: oneTask.task.content,
+        title: oneTask?.task?.content,
         start: startDate,
         end: endDate,
         id: oneTask._id,
         allDay: false,
         done: oneTask.done,
         color: oneTask.done ? "#4CAF50" : "#f44336",
-        details: oneTask.task.description,
-        taskId: oneTask.task._id,
+        details: oneTask?.task?.description,
+        taskId: oneTask?.task?._id,
       };
     });
     setProgressPercentage(

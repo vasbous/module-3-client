@@ -21,7 +21,7 @@ export const LoginPage = () => {
 
   function handleLogin(e) {
     e.preventDefault();
-    console.log(userData);
+    // console.log(userData);
     loginUser(userData);
   }
 

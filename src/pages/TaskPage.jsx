@@ -186,7 +186,7 @@ export const TaskPage = () => {
       setTaskDuration(30);
       setEndDateData(dayjs().add(31, "minute"));
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   }
 

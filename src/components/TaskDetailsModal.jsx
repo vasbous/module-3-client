@@ -8,7 +8,7 @@ export const TaskDetailsModal = ({ isOpen, onClose, taskDetails }) => {
   if (!isOpen) return null;
   const { currentUser, refetchUser } = useContext(AuthContext);
   const { changeTaskPlan } = useContext(TaskContext);
-  console.log(taskDetails.taskId);
+  // console.log(taskDetails.taskId);
   async function newTask() {
     const data = {
       oldTaskId: taskDetails.taskId,

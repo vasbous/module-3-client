@@ -23,8 +23,8 @@ export const SignUpPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    createUser(userData);
-    loginUser(userData);
+    await createUser(userData);
+    await loginUser(userData);
   };
 
   return (

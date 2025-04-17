@@ -12,7 +12,6 @@ import { DashBoardPage } from "./pages/DashBoardPage";
 import { TaskPage } from "./pages/TaskPage";
 import { DiaryPage } from "./pages/DiaryPage";
 import { DiaryEntry } from "./components/DiaryEntry";
-import { ProtectedRoute } from "./components/ProtectedRoute";
 import { SignupQuestionsPage } from "./pages/SignupQuestionsPage";
 import { ProtectedQuestionRoute } from "./components/ProtectedQuestionRoute";
 import { CreatePlan } from "./components/CreatePlan";
@@ -35,9 +34,11 @@ function App() {
         <Route
           path="/signup-questions"
           element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
+            <ProtectedQuestionRoute>
               <SignupQuestionsPage />
-            </ProtectedRoute>
+            </ProtectedQuestionRoute>
+            /* </ProtectedRoute> */
           }
         />
         <Route
