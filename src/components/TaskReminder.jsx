@@ -4,7 +4,7 @@ import axios from "axios";
 import { API_URL } from "../config/config";
 
 export const TaskReminder = () => {
-  const { currentUser, setCurrentUser } = useContext(AuthContext);
+  const { currentUser, refetchUser } = useContext(AuthContext);
   // Use a ref to track reminders that have been sent in the current session
   const sessionReminders = useRef(new Set());
   const isInitialMount = useRef(true);
@@ -13,7 +13,7 @@ export const TaskReminder = () => {
   useEffect(() => {
     if (!currentUser || !currentUser.plan) return;
 
-    console.log("TaskReminder component mounted");
+    // console.log("TaskReminder component mounted");
 
     // Force the initial check to run after component is fully mounted
     setTimeout(() => {
@@ -29,7 +29,7 @@ export const TaskReminder = () => {
 
     // Create a custom event handler to manually trigger the check
     const manualCheckHandler = () => {
-      console.log("Manual check triggered");
+      // console.log("Manual check triggered");
       checkForUpcomingTasks();
     };
 
@@ -37,7 +37,7 @@ export const TaskReminder = () => {
     window.addEventListener("checkTaskReminders", manualCheckHandler);
 
     return () => {
-      console.log("TaskReminder component unmounted");
+      // console.log("TaskReminder component unmounted");
       clearInterval(checkInterval);
       // setCurrentUser(currentUser);
       window.removeEventListener("checkTaskReminders", manualCheckHandler);
@@ -54,7 +54,7 @@ export const TaskReminder = () => {
     if (!currentUser || !currentUser.plan) return;
 
     try {
-      console.log("Checking for upcoming tasks...");
+      // console.log("Checking for upcoming tasks...");
       const today = new Date();
 
       const response = await axios.get(
@@ -69,11 +69,11 @@ export const TaskReminder = () => {
       );
 
       if (!response.data || response.data.length === 0) {
-        console.log("No tasks found for today");
+        // console.log("No tasks found for today");
         return;
       }
 
-      console.log(`Found ${response.data.length} tasks for today`);
+      // console.log(`Found ${response.data.length} tasks for today`);
 
       const now = new Date();
       const tasksToProcess = [];
@@ -83,9 +83,9 @@ export const TaskReminder = () => {
         const taskTime = new Date(taskItem.startDate);
         const minutesDiff = Math.floor((taskTime - now) / (1000 * 60));
 
-        console.log(
-          `Task "${taskItem.task.content}" is ${minutesDiff} minutes away`
-        );
+        // console.log(
+        //   `Task "${taskItem.task.content}" is ${minutesDiff} minutes away`
+        // );
 
         // Generate unique reminder keys for this task
         const tenMinReminderKey = `${taskId}-10min`;
@@ -94,40 +94,40 @@ export const TaskReminder = () => {
         // Check for 10-minute reminder (8-12 minute window)
         if (minutesDiff <= 10 && minutesDiff >= 9) {
           if (!sessionReminders.current.has(tenMinReminderKey)) {
-            console.log(
-              `Task "${taskItem.task.content}" qualifies for 10-minute reminder`
-            );
+            // console.log(
+            //   `Task "${taskItem.task.content}" qualifies for 10-minute reminder`
+            // );
             tasksToProcess.push({
               ...taskItem,
               reminderType: "10min",
               reminderKey: tenMinReminderKey,
             });
           } else {
-            console.log(
-              `10-minute reminder already sent for task "${taskItem.task.content}"`
-            );
+            // console.log(
+            //   `10-minute reminder already sent for task "${taskItem.task.content}"`
+            // );
           }
         } else if (minutesDiff <= 60 && minutesDiff >= 59) {
           if (!sessionReminders.current.has(sixtyMinReminderKey)) {
-            console.log(
-              `Task "${taskItem.task.content}" qualifies for 60-minute reminder`
-            );
+            // console.log(
+            //   `Task "${taskItem.task.content}" qualifies for 60-minute reminder`
+            // );
             tasksToProcess.push({
               ...taskItem,
               reminderType: "60min",
               reminderKey: sixtyMinReminderKey,
             });
           } else {
-            console.log(
-              `60-minute reminder already sent for task "${taskItem.task.content}"`
-            );
+            // console.log(
+            //   `60-minute reminder already sent for task "${taskItem.task.content}"`
+            // );
           }
         }
       });
 
       // Process each task that needs a reminder
       if (tasksToProcess.length > 0) {
-        console.log(`Processing ${tasksToProcess.length} task reminders`);
+        // console.log(`Processing ${tasksToProcess.length} task reminders`);
 
         for (const taskItem of tasksToProcess) {
           // Mark this reminder as processed immediately to prevent duplicates
@@ -147,7 +147,7 @@ export const TaskReminder = () => {
           await processReminder(taskItem);
         }
       } else {
-        console.log("No tasks need reminders at this time");
+        // console.log("No tasks need reminders at this time");
       }
     } catch (error) {
       console.error("Error checking for upcoming tasks:", error);
@@ -156,7 +156,7 @@ export const TaskReminder = () => {
 
   const processReminder = async (taskItem) => {
     try {
-      console.log(`Processing reminder for task "${taskItem.task.content}"`);
+      // console.log(`Processing reminder for task "${taskItem.task.content}"`);
 
       // 1. Add message to chat history first
       await addReminderMessage(taskItem);
@@ -167,11 +167,12 @@ export const TaskReminder = () => {
       // 3. Create and show notification (do this last)
       setTimeout(() => {
         showNotification(taskItem);
-      }, 500); // Small delay to ensure chat UI is ready
+      }, 500);
+      // Small delay to ensure chat UI is ready
 
-      console.log(
-        `Reminder processing complete for task "${taskItem.task.content}"`
-      );
+      // console.log(
+      //   `Reminder processing complete for task "${taskItem.task.content}"`
+      // );
     } catch (error) {
       console.error(
         `Error processing reminder for task "${taskItem.task.content}":`,
@@ -197,7 +198,7 @@ export const TaskReminder = () => {
     // Show notification if browser supports it
     if ("Notification" in window) {
       if (Notification.permission === "granted") {
-        console.log(`Showing notification for task "${taskItem.task.content}"`);
+        // console.log(`Showing notification for task "${taskItem.task.content}"`);
         new Notification(notificationTitle, {
           body: notificationBody,
           icon: "/favicon.ico",
@@ -214,14 +215,14 @@ export const TaskReminder = () => {
         });
       }
     } else {
-      console.log("Notifications not supported in this browser");
+      // console.log("Notifications not supported in this browser");
     }
   };
 
   const openChatbot = async (force = false) => {
     return new Promise((resolve) => {
       try {
-        console.log("Attempting to open chatbot...");
+        // console.log("Attempting to open chatbot...");
 
         // Set chatbot state in localStorage
         localStorage.setItem("chatbotState", "true");
@@ -237,7 +238,7 @@ export const TaskReminder = () => {
           window.openChatbot();
         }
 
-        console.log("Chatbot open signals sent");
+        // console.log("Chatbot open signals sent");
 
         // Give a moment for the chatbot to open before resolving
         setTimeout(resolve, 300);
@@ -250,16 +251,16 @@ export const TaskReminder = () => {
 
   const addReminderMessage = async (taskItem) => {
     if (!currentUser || !currentUser._id) {
-      console.log("Cannot add reminder message: user not available");
+      // console.log("Cannot add reminder message: user not available");
       return;
     }
 
     const { reminderType } = taskItem;
 
     try {
-      console.log(
-        `Adding reminder message for task "${taskItem.task.content}"`
-      );
+      // console.log(
+      //   `Adding reminder message for task "${taskItem.task.content}"`
+      // );
 
       // Format the bot message
       const botMessage =
@@ -298,8 +299,9 @@ export const TaskReminder = () => {
           },
         }
       );
+      refetchUser(currentUser._id);
 
-      console.log("Reminder message added to chat history successfully");
+      // console.log("Reminder message added to chat history successfully");
 
       // Force a refresh of the chat UI if possible
       if (
