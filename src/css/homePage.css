@@ -2,6 +2,7 @@
 .container-homePage{
 min-height: 80vh;
 width: 100%;
+overflow-x: hidden;
 }
 .second-section,
 .first-section,
@@ -11,6 +12,7 @@ width: 100%;
 .six-section{
     height: 80vh;
     width: 100vw;
+    overflow-x: hidden;
     background: var(--pink);
     position: relative;
     display: flex;
@@ -48,7 +50,8 @@ width: 100%;
 /* before section */
 .before-section{
     height: 50px;
-    background: transparent;
+    margin-bottom: -1px;
+    overflow-x: hidden;
     position: relative;
 }
 .third-section{background: var(--orange);}
@@ -111,3 +114,10 @@ width: 100%;
 .five-wave .shape-fill {fill: var(--purple-pink)}
 .six-wave .shape-fill {fill: var(--blue)}
 .seven-wave .shape-fill {fill: var(--footer-background)}
+
+@media only screen and (max-width: 1350px) {
+    .img-home-page{
+        height: 40%;
+        width: 40%;
+    }
+}

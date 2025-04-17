@@ -45,6 +45,8 @@
   --modal-background: #a8e6cf;
   --task-title: #ffffff;
   --progress: #fd6fa6;
+  --about-title: #a8e6cf;
+  --about-text:#ffffff;
 }
 
 .dark-theme {
@@ -81,6 +83,8 @@
   --modal-background: #8b5f70;
   --task-title: #ffffff;
   --progress: #ffffff;
+  --about-title: #ffffff;
+  --about-text:#ffffff;
 }
 
 .lavanda-theme {
@@ -117,4 +121,7 @@
   background-image: url("../assets/lavanda-background.png");
   --modal-background: #d8d8d8;
   --progress: #000;
+  --about-title:#000;
+  --about-text: #000;
+
 }

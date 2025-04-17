@@ -8,11 +8,12 @@ import "../css/header.css"
 export const Header = () => {
   const { isLoggedIn, handleLogout } = useContext(AuthContext);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef(null);
 
-   function toggleDropdown(state) {
+  function toggleDropdown(state) {
     setShowDropdown(!state);
-  };
+  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -20,19 +21,26 @@ export const Header = () => {
         setShowDropdown(false);
       }
     };
-    // call handleClickOutside if u clic somewhere
+
     document.addEventListener("mousedown", handleClickOutside);
-    // clean useEffect before re-Use it
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // 👉 Gestion du scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
     };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
 
 
   return (
     <>
-      <header>
+      <header className={`main-header ${scrolled ? "scrolled" : ""}`}>
         <Link to="/"><h1 className="title-app">NextChapter</h1></Link>
         <div className="auth">
           {isLoggedIn ? (

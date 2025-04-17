@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../css/homePage.css";
 import { Link } from "react-router-dom";
 import question from "../assets/questionne.png";
@@ -7,6 +7,180 @@ import plan from "../assets/plan.webp";
 import task from "../assets/task.webp";
 import non from "../assets/non.webp";
 import chat from "../assets/chat.png";
+import { motion, useAnimation } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+
+const AnimatedLeftText = ({ children, className }) => {
+  const controls = useAnimation();
+  const [ref, inView] = useInView({
+    triggerOnce: true,
+    threshold: 0.5,
+  });
+
+  useEffect(() => {
+    if (inView) {
+      controls.start("visible");
+    }
+  }, [controls, inView]);
+
+  const variants = {
+    hidden: { opacity: 0, x: -200 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 1.1, ease: "easeOut" },
+    },
+  };
+
+  return (
+    <motion.h2
+      ref={ref}
+      initial="hidden"
+      animate={controls}
+      variants={variants}
+      className={className}
+    >
+      {children}
+    </motion.h2>
+  );
+};
+
+const AnimatedRightText = ({ children, className }) => {
+  const controls = useAnimation();
+  const [ref, inView] = useInView({
+    triggerOnce: true,
+    threshold: 0.5,
+  });
+
+  useEffect(() => {
+    if (inView) {
+      controls.start("visible");
+    }
+  }, [controls, inView]);
+
+  const variants = {
+    hidden: { opacity: 0, x: 200 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 1.1, ease: "easeOut" },
+    },
+  };
+
+  return (
+    <motion.h2
+      ref={ref}
+      initial="hidden"
+      animate={controls}
+      variants={variants}
+      className={className}
+    >
+      {children}
+    </motion.h2>
+  );
+};
+
+const AnimatedImage = ({ src, alt }) => {
+  const controls = useAnimation();
+  const [ref, inView] = useInView({
+    triggerOnce: true,
+    threshold: 0.4,
+  });
+
+  useEffect(() => {
+    if (inView) {
+      controls.start("visible");
+    }
+  }, [controls, inView]);
+
+  const variants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.6 } },
+  };
+
+  return (
+    <div className="img-home-page">
+      <motion.img
+        ref={ref}
+        initial="hidden"
+        animate={controls}
+        variants={variants}
+        src={src}
+        alt={alt}
+      />
+    </div>
+  );
+};
+
+// Composant bouton animé
+const AnimatedButton = ({ children }) => {
+  const controls = useAnimation();
+  const [ref, inView] = useInView({
+    triggerOnce: true,
+    threshold: 0.5,
+  });
+
+  useEffect(() => {
+    if (inView) {
+      controls.start("visible");
+    }
+  }, [controls, inView]);
+
+  const variants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, delay: 0.4 } },
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      animate={controls}
+      variants={variants}
+      className="text-center"
+    >
+      <Link className="btn">{children}</Link>
+    </motion.div>
+  );
+};
+
+const AnimatedSection = ({ children, className }) => {
+  const controls = useAnimation();
+  const [ref, inView] = useInView({
+    triggerOnce: true,
+    threshold: 0.3,
+    rootMargin: "-100px 0px",
+  });
+
+  useEffect(() => {
+    if (inView) {
+      controls.start("visible");
+    }
+  }, [controls, inView]);
+
+  const variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        when: "beforeChildren",
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  return (
+    <motion.section
+      ref={ref}
+      initial="hidden"
+      animate={controls}
+      variants={variants}
+      className={className}
+    >
+      {children}
+    </motion.section>
+  );
+};
 
 export const HomePage = () => {
   return (
@@ -20,18 +194,20 @@ export const HomePage = () => {
             preserveAspectRatio="none"
           >
             <path
-              d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
+              d="M321.39,56.44c58-10.59,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
               className="shape-fill"
             ></path>
           </svg>
         </div>
       </section>
       <section className="first-section">
-        <h2 className="title-home">Need to change</h2>
-        <div className="img-home-page">
-          <img src={question} alt="Human Question" />
-        </div>
-        <h2 className="title-home">Change your life step by step</h2>
+        <AnimatedLeftText className="title-home">
+          Need to change
+        </AnimatedLeftText>
+        <AnimatedImage src={question} alt="Human Question" />
+        <AnimatedRightText className="title-home">
+          Change your life step by step
+        </AnimatedRightText>
         <div className="second-wave">
           <svg
             data-name="Layer 1"
@@ -47,17 +223,15 @@ export const HomePage = () => {
         </div>
       </section>
       <section className="second-section">
-        <h2 className="title-home">Whatever your needs</h2>
-        <div className="img-home-page">
-          <img src={road} alt="which direction you want to take" />
-        </div>
+        <AnimatedLeftText className="title-home">
+          Whatever your needs
+        </AnimatedLeftText>
+        <AnimatedImage src={road} alt="which direction you want to take" />
         <div className="title-button-home">
-          <h2 className="title-home">
+          <AnimatedRightText className="title-home">
             Choose the change you want to make in your life
-          </h2>
-          <div className="text-center">
-            <Link className="btn">Change your life</Link>
-          </div>
+          </AnimatedRightText>
+          <AnimatedButton>Change your life</AnimatedButton>
         </div>
         <div className="third-wave">
           <svg
@@ -74,12 +248,10 @@ export const HomePage = () => {
         </div>
       </section>
       <section className="third-section">
-        <h2 className="title-home">
+        <AnimatedLeftText className="title-home">
           We create an action plan to help you reach your goal
-        </h2>
-        <div className="img-home-page">
-          <img src={plan} alt="plan and task" />
-        </div>
+        </AnimatedLeftText>
+        <AnimatedImage src={plan} alt="plan and task" />
         <div className="fourth-wave">
           <svg
             data-name="Layer 1"
@@ -95,14 +267,12 @@ export const HomePage = () => {
         </div>
       </section>
       <section className="fourth-section">
-        <div className="img-home-page">
-          <img src={task} alt="create task" />
-        </div>
+        <AnimatedImage src={task} alt="create task" />
         <div className="title-button-home">
-          <h2 className="title-home">Simple, self-paced tasks</h2>
-          <div className="text-center">
-            <Link className="btn">Create your task</Link>
-          </div>
+          <AnimatedRightText className="title-home">
+            Simple, self-paced tasks
+          </AnimatedRightText>
+          <AnimatedButton>Create your task</AnimatedButton>
         </div>
         <div className="five-wave">
           <svg
@@ -119,12 +289,10 @@ export const HomePage = () => {
         </div>
       </section>
       <section className="five-section">
-        <h2 className="title-home">
+        <AnimatedLeftText className="title-home">
           Questions? Tasks you don't want to or can't do?{" "}
-        </h2>
-        <div className="img-home-page">
-          <img src={non} alt="avatar" />
-        </div>
+        </AnimatedLeftText>
+        <AnimatedImage src={non} alt="avatar" />
         <div className="six-wave">
           <svg
             data-name="Layer 1"
@@ -140,16 +308,12 @@ export const HomePage = () => {
         </div>
       </section>
       <section className="six-section">
-        <div className="img-home-page">
-          <img src={chat} alt="little robot" />
-        </div>
+        <AnimatedImage src={chat} alt="little robot" />
         <div className="title-button-home">
-          <h2 className="title-home">
+          <AnimatedRightText className="title-home">
             Our chat, with its powerful ia,will answer all your questions.
-          </h2>
-          <div className="text-center">
-            <Link className="btn">Open Chat</Link>
-          </div>
+          </AnimatedRightText>
+          <AnimatedButton>Open Chat</AnimatedButton>
         </div>
         <div className="seven-wave">
           <svg
