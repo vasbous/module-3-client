@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import styles from "../css/AboutUs.module.css";
 import mission from "../assets/mission.png";
-import team from "../assets/team.jpg";
+import team from "../assets/newteam.jpg";
 import values from "../assets/values.jpg";
 
 const Section = ({ title, text, image, reverse }) => {
