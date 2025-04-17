@@ -24,7 +24,6 @@ export const DashBoardPage = () => {
   useEffect(() => {
     if (currentUser.plan) {
       tasksOfTheDay();
-      console.log(currentUser);
     }
 
     const events = currentUser?.plan?.tasks?.map((oneTask, key) => {
