@@ -228,7 +228,8 @@ export const CreatePlan = () => {
   if (loading) return <div className="container plan-loading">Loading...</div>;
 
   return (
-    <div className="container create-plan-container">
+    <div className="container">
+    <div className="create-plan-container">
       <h2 className="create-plan-title">Create Your Monthly Action Plan</h2>
       {error && <div className="create-plan-error">{error}</div>}
       <div className="plan-info">
@@ -303,6 +304,6 @@ export const CreatePlan = () => {
           </div>
         </div>
       )}
-    </div>
+    </div></div>
   );
 };

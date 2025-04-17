@@ -10,20 +10,32 @@
   font-style: normal;
 }
 body {
+  padding-top: 6vh;
   background-size: cover;
   /* background: linear-gradient(
     20deg,
     rgba(168, 230, 207, 1) 0%,
     rgba(248, 175, 203, 1) 100%
   ); */
+  overflow-x: hidden;
   background-repeat: no-repeat;
   min-height: 100vh;
 }
 
 footer {
   height: 12vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
   border-radius: 5px 5px 0px 0px;
   background: var(--footer-background);
+  color: var(--color-title);
+  
+}
+
+footer a[data-discover=true]{
+  color: var(--color-title);
 }
 
 /* CONTAINER */
@@ -229,8 +241,15 @@ h3 {
   font-size: 1.5rem;
 }
 
-a {
+a,
+a:visited {
   text-decoration: none;
+}
+footer a{
+  font-family: "Fredoka", sans-serif;
+  font-weight: 900;
+  font-size: 1.6rem;
+  
 }
 
 .signup-questions-container {
