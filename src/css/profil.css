@@ -132,3 +132,67 @@
   font-weight: bold;
   color: var(--text-light);
 }
+
+/* Make sure the profile picture wrapper is properly styled as a circle */
+.profile-pic-wrapper {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid var(--text-light);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Force the image to fill the circular container */
+.profile-pic {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%; /* Add border-radius to the image itself too */
+}
+
+/* Improved button styles */
+.profile-pic-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+  width: 100%;
+  max-width: 200px;
+}
+
+.profile-pic-btn {
+  width: 100%;
+  padding: 8px 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Make sure modal is visible and properly positioned */
+.profile-pic-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Debug styles to help identify modal visibility issues */
+.profile-pic-modal {
+  background-color: var(--main-container-background, white);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+}

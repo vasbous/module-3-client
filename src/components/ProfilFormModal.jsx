@@ -17,14 +17,20 @@ export const ProfilFormModal = ({ isOpen, onClose, toUpdate }) => {
           </button>
         </div>
         <div className="modal-body">
-          {toUpdate==="username" && <FormName property={toUpdate} onClose={onClose}/>}
-          {toUpdate==="email" && <FormEmail property={toUpdate} onClose={onClose}/>}
-          {toUpdate==="password" && <FormPassword property={toUpdate} onClose={onClose}/>}
+          {toUpdate === "username" && (
+            <FormName property={toUpdate} onClose={onClose} />
+          )}
+          {toUpdate === "email" && (
+            <FormEmail property={toUpdate} onClose={onClose} />
+          )}
+          {toUpdate === "password" && (
+            <FormPassword property={toUpdate} onClose={onClose} />
+          )}
         </div>
         <div className="modal-footer">
-          <button className="btn btn-primary" onClick={onClose}>
+          {/* <button className="btn btn-primary" onClick={onClose}>
             Close
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

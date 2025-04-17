@@ -20,10 +20,8 @@ const AuthContextWrapper = ({ children }) => {
       setCurrentUser(null);
       setIsLoading(false);
       setIsLoggedIn(false);
-      // console.log("lol");
     } else {
       try {
-        // console.log(localStorage.getItem("authToken"));
         const responseFromVerifyRoute = await axios.get(
           `${API_URL}/auth/verify`,
           {
@@ -32,16 +30,13 @@ const AuthContextWrapper = ({ children }) => {
             },
           }
         );
-
         const currentUserData = await axios.get(
           `${API_URL}/user/${responseFromVerifyRoute.data.payload._id}`
         );
-
         setCurrentUser(currentUserData.data);
         setIsLoading(false);
         setIsLoggedIn(true);
       } catch (error) {
-        // console.log(error);
         setCurrentUser(null);
         setIsLoading(false);
         setIsLoggedIn(false);
@@ -69,7 +64,6 @@ const AuthContextWrapper = ({ children }) => {
 
       // Get the token from localStorage to verify
       const tokenFromLocalStorage = localStorage.getItem("authToken");
-
       if (tokenFromLocalStorage) {
         try {
           const responseFromVerifyRoute = await axios.get(
@@ -80,7 +74,6 @@ const AuthContextWrapper = ({ children }) => {
               },
             }
           );
-
           const currentUserData = await axios.get(
             `${API_URL}/user/${responseFromVerifyRoute.data.payload._id}`
           );
@@ -97,14 +90,12 @@ const AuthContextWrapper = ({ children }) => {
             nav("/signup-questions");
           }
         } catch (error) {
-          // console.log(error);
           setCurrentUser(null);
           setIsLoading(false);
           setIsLoggedIn(false);
         }
       }
     } catch (err) {
-      // console.log(err);
       toast.error(err?.response?.data?.message);
     }
   }
@@ -122,12 +113,10 @@ const AuthContextWrapper = ({ children }) => {
         if (token) {
           await loginUser(data);
         }
-        // nav("/dashboard");
       } else {
         toast.error(response.data.message || "Signup failed");
       }
     } catch (error) {
-      // console.error("Signup error:", error);
       toast.error(
         error.response?.data?.message ||
           "Something went wrong. Please try again."
@@ -135,27 +124,78 @@ const AuthContextWrapper = ({ children }) => {
     }
   }
 
-  async function updateUser(property, data) {
+  // Updated updateUser function with proper error handling
+  const updateUser = async (property, data) => {
     try {
       const response = await axios.patch(
         `${API_URL}/user/update/${property}/${currentUser._id}`,
         data
       );
-      // console.log(response)
-      return response.data.userInDB;
+      return response.data;
     } catch (error) {
-      // console.log(error.response?.data?.message);
-      // console.error(error)
-      toast.error(
-        error.response?.data?.message ||
-          "Something went wrong. Please try again."
-      );
+      console.error("Error updating user:", error);
+      throw error;
     }
-  }
+  };
 
-  const refetchUser = async (id) => {
-    const res = await axios.get(`${API_URL}/user/${id}`);
-    setCurrentUser(res.data);
+  // Updated refetchUser function with proper error handling
+  const refetchUser = async (userId) => {
+    try {
+      const response = await axios.get(`${API_URL}/user/${userId}`);
+      setCurrentUser(response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error refetching user:", error);
+      return null;
+    }
+  };
+
+  // Updated uploadProfilePic function
+  const uploadProfilePic = async (userId, imageFile) => {
+    try {
+      const formData = new FormData();
+      formData.append("profileImage", imageFile);
+
+      const response = await axios.post(
+        `${API_URL}/user/profilepic/${userId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      // Update current user with new profile pic
+      setCurrentUser((prev) => ({
+        ...prev,
+        profilepic: response.data.profilepic,
+      }));
+
+      return response.data;
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+      throw error;
+    }
+  };
+
+  // New function to delete profile picture
+  const deleteProfilePic = async (userId) => {
+    try {
+      const response = await axios.delete(
+        `${API_URL}/user/profilepic/${userId}`
+      );
+      // Update current user to default profile pic
+      setCurrentUser((prev) => ({
+        ...prev,
+        profilepic: "defaultpic",
+      }));
+
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting profile picture:", error);
+      throw error;
+    }
   };
 
   // update user plan
@@ -202,7 +242,6 @@ const AuthContextWrapper = ({ children }) => {
       refetchUser(currentUser._id);
       if (up) {
         // confetti here
-
         return true;
       }
       return false;
@@ -229,6 +268,8 @@ const AuthContextWrapper = ({ children }) => {
         updateUserPlan,
         updateUser,
         lvlProgression,
+        uploadProfilePic,
+        deleteProfilePic,
       }}
     >
       {children}
