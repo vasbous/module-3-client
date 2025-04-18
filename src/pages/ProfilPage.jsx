@@ -68,7 +68,7 @@ export const ProfilPage = () => {
       );
     } catch (error) {
       toast.error("Failed to update chatbot preference");
-      setChatbotToggle(chatbotToggle); // Revert toggle if update fails
+      setChatbotToggle(chatbotToggle); // Revert toggle if upda te fails
     }
   };
 
