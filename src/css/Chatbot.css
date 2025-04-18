@@ -46,7 +46,7 @@
 
 .user-message {
   align-self: flex-end;
-  background-color: var(--btn);
+  background-color: var(--user-message-bg);
   color: var(--texte-dark);
   border-bottom-right-radius: 5px;
 }
@@ -179,7 +179,7 @@
 }
 
 .chatbot-send-btn:disabled {
-  background-color: var(--question-background);
+  background-color: var(--chatbot-send-btn-bg);
   cursor: not-allowed;
 }
 

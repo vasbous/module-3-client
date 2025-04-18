@@ -14,7 +14,7 @@ const AnimatedLeftText = ({ children, className }) => {
   const controls = useAnimation();
   const [ref, inView] = useInView({
     triggerOnce: true,
-    threshold: 0.5,
+    threshold: 0.3,
   });
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const AnimatedLeftText = ({ children, className }) => {
   }, [controls, inView]);
 
   const variants = {
-    hidden: { opacity: 0, x: -200 },
+    hidden: { opacity: 0, x: -100 },
     visible: {
       opacity: 1,
       x: 0,
@@ -49,7 +49,7 @@ const AnimatedRightText = ({ children, className }) => {
   const controls = useAnimation();
   const [ref, inView] = useInView({
     triggerOnce: true,
-    threshold: 0.5,
+    threshold: 0.3,
   });
 
   useEffect(() => {
@@ -59,7 +59,7 @@ const AnimatedRightText = ({ children, className }) => {
   }, [controls, inView]);
 
   const variants = {
-    hidden: { opacity: 0, x: 200 },
+    hidden: { opacity: 0, x: 100 },
     visible: {
       opacity: 1,
       x: 0,
@@ -84,7 +84,7 @@ const AnimatedImage = ({ src, alt }) => {
   const controls = useAnimation();
   const [ref, inView] = useInView({
     triggerOnce: true,
-    threshold: 0.4,
+    threshold: 0.2,
   });
 
   useEffect(() => {
@@ -117,7 +117,7 @@ const AnimatedButton = ({ children }) => {
   const controls = useAnimation();
   const [ref, inView] = useInView({
     triggerOnce: true,
-    threshold: 0.5,
+    threshold: 0.3,
   });
 
   useEffect(() => {

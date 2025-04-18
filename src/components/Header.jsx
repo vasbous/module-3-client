@@ -1,12 +1,11 @@
 import React from "react";
 import { NavLink, Link } from "react-router-dom";
-import { useContext , useState, useEffect, useRef} from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { AuthContext } from "../context/AuthContext";
-import "../css/header.css"
-
+import "../css/header.css";
 
 export const Header = () => {
-  const { isLoggedIn, handleLogout } = useContext(AuthContext);
+  const { isLoggedIn, handleLogout, currentUser } = useContext(AuthContext);
   const [showDropdown, setShowDropdown] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef(null);
@@ -26,7 +25,6 @@ export const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 👉 Gestion du scroll
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -36,33 +34,47 @@ export const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-
-
   return (
     <>
       <header className={`main-header ${scrolled ? "scrolled" : ""}`}>
-        <Link to="/"><h1 className="title-app">NextChapter</h1></Link>
+        <Link to="/">
+          <h1 className="title-app">NextChapter</h1>
+        </Link>
         <div className="auth">
           {isLoggedIn ? (
-           <div
-           className="dropdown" ref={dropdownRef}
-         >
-           <i
-             className="fa-solid fa-circle-user user-icon"
-             onClick={() => toggleDropdown(showDropdown)}
-           ></i>
-           {showDropdown && (
-             <ul className={`dropdown-menu ${showDropdown ? "show" : "hide"}`}>
-              <NavLink to="/profil"><li>
-                  Profil
-               </li></NavLink>
-               <NavLink to="/dashboard"><li>
-                 Dashboard
-               </li></NavLink>
-               <li onClick={handleLogout}>Logout</li>
-             </ul>
-           )}
-         </div>
+            <div className="dropdown" ref={dropdownRef}>
+              {currentUser?.profilepic !== "defaultpic" ? (
+                <div
+                  className="pic-icon"
+                  onClick={() => toggleDropdown(showDropdown)}
+                >
+                  <img
+                    src={currentUser.profilepic}
+                    alt="profil pic"
+                    className="profile-pic"
+                  />
+                </div>
+              ) : (
+                <i
+                  className="fa-solid fa-circle-user user-icon"
+                  onClick={() => toggleDropdown(showDropdown)}
+                ></i>
+              )}
+
+              {showDropdown && (
+                <ul
+                  className={`dropdown-menu ${showDropdown ? "show" : "hide"}`}
+                >
+                  <NavLink to="/profil">
+                    <li>Profil</li>
+                  </NavLink>
+                  <NavLink to="/dashboard">
+                    <li>Dashboard</li>
+                  </NavLink>
+                  <li onClick={handleLogout}>Logout</li>
+                </ul>
+              )}
+            </div>
           ) : (
             <>
               <NavLink to="/login" className="btn btn-auth">

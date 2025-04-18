@@ -46,7 +46,9 @@
   --task-title: #ffffff;
   --progress: #fd6fa6;
   --about-title: #a8e6cf;
-  --about-text:#ffffff;
+  --about-text: #ffffff;
+  --user-message-bg: #a8e6cf;
+  --chatbot-send-btn-bg: #fdc8a7;
 }
 
 .dark-theme {
@@ -84,7 +86,9 @@
   --task-title: #ffffff;
   --progress: #ffffff;
   --about-title: #ffffff;
-  --about-text:#ffffff;
+  --about-text: #ffffff;
+  --user-message-bg: #37554a;
+  --chatbot-send-btn-bg: #6c99b9;
 }
 
 .lavanda-theme {
@@ -121,7 +125,8 @@
   background-image: url("../assets/lavanda-background.png");
   --modal-background: #d8d8d8;
   --progress: #000;
-  --about-title:#000;
+  --about-title: #000;
   --about-text: #000;
-
+  --user-message-bg: ##8d76a1;
+  --chatbot-send-btn-bg: #ffffff;
 }
