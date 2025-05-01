@@ -107,7 +107,6 @@ const AuthContextWrapper = ({ children }) => {
           "Content-Type": "application/json",
         },
       });
-     
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
@@ -125,8 +124,7 @@ const AuthContextWrapper = ({ children }) => {
       );
       return response.data;
     } catch (error) {
-      console.error("Error updating user:", error);
-      throw error;
+      toast.error(error.response?.data?.message || "Error updating user:");
     }
   };
 
