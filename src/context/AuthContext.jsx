@@ -107,15 +107,7 @@ const AuthContextWrapper = ({ children }) => {
           "Content-Type": "application/json",
         },
       });
-      if (response.status === 201) {
-        localStorage.setItem("authToken", response.data.token);
-        const token = localStorage.getItem("authToken");
-        if (token) {
-          await loginUser(data);
-        }
-      } else {
-        toast.error(response.data.message || "Signup failed");
-      }
+     
     } catch (error) {
       toast.error(
         error.response?.data?.message ||

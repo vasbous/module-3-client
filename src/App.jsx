@@ -22,6 +22,7 @@ import { TaskReminder } from "./components/TaskReminder";
 import { API_URL } from "./config/config";
 import AboutUs from "./pages/AboutPage";
 import ScrollTop from "./components/ScrollTop";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   const { isLoggedIn } = useContext(AuthContext);
@@ -103,6 +104,7 @@ function App() {
           }
         />
         <Route path="/about" element={<AboutUs />} />
+        <Route path="*" element={<NotFoundPage/>}/>
       </Routes>
       <Toaster position="top-left" reverseOrder={false} />
       <Footer />

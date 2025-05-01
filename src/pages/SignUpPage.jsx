@@ -1,19 +1,20 @@
 import React from "react";
 import { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 export const SignUpPage = () => {
+  // create a object with all required user property and set all with the value empty string
   const [userData, setUserData] = useState({
     username: "",
     email: "",
     password: "",
   });
-
-  const nav = useNavigate();
-  const { createUser, errorMessage } = useContext(AuthContext);
-  const { loginUser } = useContext(AuthContext);
-
+// hook 2 function from AuthContext
+  const { createUser,loginUser } = useContext(AuthContext);
+ 
+// create a function to setUserData change after user write something inside form
+// e.target.name = property inside userData (username, email, password)
+// e.target.value refer to the text write inside this input
   const handleChange = (e) => {
     setUserData({
       ...userData,
