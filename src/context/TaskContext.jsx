@@ -103,7 +103,7 @@ const TaskContextWrapper = ({ children }) => {
   async function tasksOfTheDay() {
     try {
       const tasks = await axios.get(
-        `${API_URL}/plan/tasks/${currentUser.plan._id}`,
+        `${API_URL}/plan/tasks/${currentUser.plan._id}?date=${dayjs().format("YYYY-MM-DD")}`,
         {
           headers: {
             authorization: `Bearer ${localStorage.getItem("authToken")}`,
