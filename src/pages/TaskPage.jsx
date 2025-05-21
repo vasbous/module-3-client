@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
@@ -56,6 +56,32 @@ export const TaskPage = () => {
 
     fetchTasks();
   }, [currentUser, dateTaskDisplay]);
+
+  const formRef = useRef(null);
+
+  // Handle click outside to close form
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (formTask && formRef.current && !formRef.current.contains(event.target)) {
+        // Check if the click is on the "Create new Task" button
+        const createButton = document.querySelector('.create-task-button');
+        if (createButton && createButton.contains(event.target)) {
+          return; // Don't close if clicking the create button
+        }
+        setFormTask(null);
+      }
+    }
+
+    // Add event listener when the form is open
+    if (formTask) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    // Clean up
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [formTask]);
 
   function openForm() {
     setFormTask(formTask ? null : 1);
@@ -208,7 +234,7 @@ export const TaskPage = () => {
             <div className="text-center">No task today</div>
           )}
           {formTask && (
-            <form className="task-form" onSubmit={handleTaskSubmit}>
+            <form ref={formRef} className="task-form" onSubmit={handleTaskSubmit}>
               <div className="input-container input-task">
                 <input
                   type="text"
@@ -267,8 +293,8 @@ export const TaskPage = () => {
           <i className="fa-solid fa-chevron-right"></i>
         </div>
       </div>
-      <button className="btn btn-success" onClick={openForm}>
-        Create new Task
+      <button className="btn btn-success create-task-button" onClick={openForm}>
+        {formTask ? 'Cancel' : 'Create new Task'}
       </button>
     </div>
   );

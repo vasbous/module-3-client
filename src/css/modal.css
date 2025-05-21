@@ -1,68 +1,158 @@
 /* Add this to your existing CSS file */
 
+/* Modal Overlay */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 15px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: var(--modal-background);
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Modal Date */
+.modal-date {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 15px;
+  font-size: 0.9em;
+  color: var(--text-secondary);
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--text-ligneH-container);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.4em;
+  color: var(--text-primary);
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 5px;
+  margin: -5px -5px -5px 10px;
+  transition: color 0.2s ease;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: var(--text-primary);
+  outline: none;
+}
+
+/* Modal Body */
+.modal-body {
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.task-description {
+  margin: 15px 0;
+  padding: 15px;
+  background-color: var(--background-secondary);
+  border-radius: 6px;
+  font-size: 0.95em;
+  line-height: 1.6;
+}
+
+/* Modal Footer */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 15px;
+  border-top: 1px solid var(--text-ligneH-container);
+  margin-top: 20px;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 15px;
+    width: 95%;
   }
   
-  .modal-content {
-    background-color: var(--modal-background);
-    padding: 20px;
-    border-radius: 5px;
-    min-width: 300px;
-    max-width: 600px;
-    width: 80%;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  .modal-date{
-    display: flex;
-    justify-content: space-between;
-  }
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    border-bottom: 1px solid var(--text-ligneH-container);
-    padding-bottom: 10px;
+  .modal-header h3 {
+    font-size: 1.2em;
   }
   
   .close-button {
-    background: none;
-    border: none;
     font-size: 24px;
-    cursor: pointer;
-    color: #333;
-  }
-  
-  .modal-body {
-    margin-bottom: 15px;
   }
   
   .task-description {
-    text-align: center;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    padding: 10px;
+    font-size: 0.9em;
   }
   
   .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    border-top: 1px solid var(--text-ligneH-container);
-    padding-top: 15px;
+    flex-direction: column;
+    gap: 10px;
   }
+  
+  .btn {
+    width: 100%;
+    margin: 0;
+  }
+}
 
-  .form-actions{
-    display: flex;
-    justify-content: space-around;
-  }
+/* Animation for modal appearance */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

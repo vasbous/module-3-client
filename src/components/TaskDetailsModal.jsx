@@ -1,14 +1,36 @@
-// import React from "react";
+import { useContext, useEffect, useRef } from "react";
 import "../css/modal.css";
-import { useContext, useState } from "react";
 import { TaskContext } from "../context/TaskContext";
 import { AuthContext } from "../context/AuthContext";
 
 export const TaskDetailsModal = ({ isOpen, onClose, taskDetails }) => {
-  if (!isOpen) return null;
   const { currentUser, refetchUser } = useContext(AuthContext);
   const { changeTaskPlan } = useContext(TaskContext);
-  // console.log(taskDetails.taskId);
+  const modalRef = useRef(null);
+
+  // Handle click outside to close
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        onClose();
+      }
+    }
+
+    // Add event listener when the modal is open
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+    }
+
+    // Clean up
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
   async function newTask() {
     const data = {
       oldTaskId: taskDetails.taskId,
@@ -19,12 +41,17 @@ export const TaskDetailsModal = ({ isOpen, onClose, taskDetails }) => {
     await refetchUser(currentUser._id);
     onClose();
   }
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay">
+      <div className="modal-content" ref={modalRef}>
         <div className="modal-header">
           <h3>{taskDetails.title}</h3>
-          <button className="close-button" onClick={onClose}>
+          <button 
+            className="close-button" 
+            onClick={onClose}
+            aria-label="Close modal"
+          >
             ×
           </button>
         </div>
@@ -45,7 +72,11 @@ export const TaskDetailsModal = ({ isOpen, onClose, taskDetails }) => {
         </div>
         <div className="modal-footer">
           {!taskDetails.done && (
-            <button className="btn btn-primary" onClick={newTask}>
+            <button 
+              className="btn btn-primary" 
+              onClick={newTask}
+              style={{ width: '100%' }}
+            >
               Change this task
             </button>
           )}

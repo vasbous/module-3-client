@@ -1,78 +1,84 @@
-
-.container-homePage{
-min-height: 80vh;
-width: 100%;
-overflow-x: hidden;
+.container-homePage {
+  min-height: 80vh;
+  width: 100%;
+  overflow-x: hidden;
 }
 .second-section,
 .first-section,
 .third-section,
 .fourth-section,
 .five-section,
-.six-section{
-    height: 80vh;
-    width: 100vw;
-    overflow-x: hidden;
-    background: var(--pink);
-    position: relative;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 0 15px;
+.six-section {
+  height: 80vh;
+  width: 100vw;
+  overflow-x: hidden;
+  background: var(--pink);
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 15px;
 }
 
-.title-home{
-    width: 33%;
-    text-align: center;
-    word-wrap: break-word;
-    color:var(--white);
-    
+.title-home {
+  width: 33%;
+  text-align: center;
+  word-wrap: break-word;
+  color: var(--white);
 }
-.title-button-home{
-    width: 33%;
+.title-button-home {
+  width: 33%;
 }
-.title-button-home .title-home{
-    width: 100%;
+.title-button-home .title-home {
+  width: 100%;
 }
-.img-home-page{
-    height: 70%;
+.img-home-page {
+  height: 70%;
 }
-.img-home-page img{
-    width: 100%;
+.img-home-page img {
+  width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-.second-section{
-    background: var(--green);
+.second-section {
+  background: var(--green);
 }
 
 /* before section */
-.before-section{
-    height: 50px;
-    margin-bottom: -1px;
-    overflow-x: hidden;
-    position: relative;
+.before-section {
+  height: 50px;
+  margin-bottom: -1px;
+  overflow-x: hidden;
+  position: relative;
 }
-.third-section{background: var(--orange);}
-.fourth-section{background: var(--yellow);}
-.five-section{background: var(--purple-pink);}
-.six-section{background: var(--blue);}
-.first-wave{
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    overflow: hidden;
-    line-height: 0;
-    transform: rotate(180deg);
+.third-section {
+  background: var(--orange);
+}
+.fourth-section {
+  background: var(--yellow);
+}
+.five-section {
+  background: var(--purple-pink);
+}
+.six-section {
+  background: var(--blue);
+}
+.first-wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  transform: rotate(180deg);
 }
 
 .first-wave svg {
-    position: relative;
-    display: block;
-    width: calc(100% + 1.3px);
-    height: 56px;
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 56px;
 }
 .second-wave,
 .third-wave,
@@ -80,44 +86,52 @@ overflow-x: hidden;
 .five-wave,
 .six-wave,
 .seven-wave {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    overflow: hidden;
-    line-height: 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
 }
 .fourth-wave svg,
 .five-wave svg,
 .six-wave svg,
 .seven-wave svg,
 .second-wave svg,
-.third-wave svg{
-    position: relative;
-    display: block;
-    width: calc(100% + 1.3px);
-    height: 100px;
-    transform: rotateY(180deg);
+.third-wave svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 100px;
+  transform: rotateY(180deg);
 }
 
 .first-wave .shape-fill {
-    fill: var(--pink);
+  fill: var(--pink);
 }
 .second-wave .shape-fill {
-    fill: var(--green);
+  fill: var(--green);
 }
 .third-wave .shape-fill {
-    fill: var(--orange);
+  fill: var(--orange);
 }
 
-.fourth-wave .shape-fill {fill: var(--yellow)}
-.five-wave .shape-fill {fill: var(--purple-pink)}
-.six-wave .shape-fill {fill: var(--blue)}
-.seven-wave .shape-fill {fill: var(--footer-background)}
+.fourth-wave .shape-fill {
+  fill: var(--yellow);
+}
+.five-wave .shape-fill {
+  fill: var(--purple-pink);
+}
+.six-wave .shape-fill {
+  fill: var(--blue);
+}
+.seven-wave .shape-fill {
+  fill: var(--footer-background);
+}
 
 @media only screen and (max-width: 1350px) {
-    .img-home-page{
-        height: 40%;
-        width: 40%;
-    }
+  .img-home-page {
+    height: 40%;
+    width: 40%;
+  }
 }
