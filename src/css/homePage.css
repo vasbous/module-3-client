@@ -1,56 +1,88 @@
+/* Base container styling */
 .container-homePage {
   min-height: 80vh;
   width: 100%;
   overflow-x: hidden;
 }
+
+/* Common section styling with mobile-first approach */
 .second-section,
 .first-section,
 .third-section,
 .fourth-section,
 .five-section,
 .six-section {
-  height: 80vh;
-  width: 100vw;
+  min-height: 100vh; /* Changed from fixed height to min-height */
+  width: 100%;
   overflow-x: hidden;
   background: var(--pink);
   position: relative;
   display: flex;
-  justify-content: space-around;
+  flex-direction: column; /* Stack elements vertically on mobile */
+  justify-content: center;
   align-items: center;
-  padding: 0 15px;
+  padding: 20px 15px 60px; /* Added padding at bottom to account for wave */
+  gap: 30px; /* Add space between elements */
 }
 
+/* Title styling with full width on mobile */
 .title-home {
-  width: 33%;
+  width: 90%;
   text-align: center;
   word-wrap: break-word;
   color: var(--white);
+  font-size: 1.5rem; /* Base font size for mobile */
+  margin: 0;
 }
+
+/* Container for title and button */
 .title-button-home {
-  width: 33%;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
+
+/* Make title 100% width inside title-button-home */
 .title-button-home .title-home {
   width: 100%;
 }
+
+/* Image container styling */
 .img-home-page {
-  height: 70%;
+  width: 90%;
+  max-height: 40vh; /* Limit height on mobile */
+  display: flex;
+  justify-content: center;
 }
+
+/* Image styling */
 .img-home-page img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  max-width: 350px; /* Prevent images from getting too large on mobile */
 }
 
+/* Button styling */
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: 600;
+  width: fit-content;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Section background colors */
 .second-section {
   background: var(--green);
-}
-
-/* before section */
-.before-section {
-  height: 50px;
-  margin-bottom: -1px;
-  overflow-x: hidden;
-  position: relative;
 }
 .third-section {
   background: var(--orange);
@@ -64,6 +96,16 @@
 .six-section {
   background: var(--blue);
 }
+
+/* Wave divider section */
+.before-section {
+  height: 50px;
+  margin-bottom: -1px;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Wave styling */
 .first-wave {
   position: absolute;
   bottom: 0;
@@ -80,6 +122,7 @@
   width: calc(100% + 1.3px);
   height: 56px;
 }
+
 .second-wave,
 .third-wave,
 .fourth-wave,
@@ -92,20 +135,23 @@
   width: 100%;
   overflow: hidden;
   line-height: 0;
+  z-index: 10; /* Ensure waves appear above content */
 }
+
+.second-wave svg,
+.third-wave svg,
 .fourth-wave svg,
 .five-wave svg,
 .six-wave svg,
-.seven-wave svg,
-.second-wave svg,
-.third-wave svg {
+.seven-wave svg {
   position: relative;
   display: block;
   width: calc(100% + 1.3px);
-  height: 100px;
+  height: 50px; /* Reduced height on mobile */
   transform: rotateY(180deg);
 }
 
+/* Wave fill colors */
 .first-wave .shape-fill {
   fill: var(--pink);
 }
@@ -115,7 +161,6 @@
 .third-wave .shape-fill {
   fill: var(--orange);
 }
-
 .fourth-wave .shape-fill {
   fill: var(--yellow);
 }
@@ -129,9 +174,136 @@
   fill: var(--footer-background);
 }
 
-@media only screen and (max-width: 1350px) {
+/* Tablet breakpoint */
+@media screen and (min-width: 768px) {
+  .title-home {
+    width: 80%;
+    font-size: 1.8rem;
+  }
+
+  .title-button-home {
+    width: 80%;
+  }
+
   .img-home-page {
-    height: 40%;
-    width: 40%;
+    width: 70%;
+    max-height: 45vh;
+  }
+
+  .img-home-page img {
+    max-width: 450px;
+  }
+
+  .second-wave svg,
+  .third-wave svg,
+  .fourth-wave svg,
+  .five-wave svg,
+  .six-wave svg,
+  .seven-wave svg {
+    height: 70px;
+  }
+}
+
+/* Desktop breakpoint */
+@media screen and (min-width: 1024px) {
+  .second-section,
+  .first-section,
+  .third-section,
+  .fourth-section,
+  .five-section,
+  .six-section {
+    flex-direction: row; /* Side by side on desktop */
+    min-height: 80vh;
+    justify-content: space-around;
+    padding: 0 30px 100px;
+  }
+
+  .title-home {
+    width: 33%;
+    font-size: 2rem;
+  }
+
+  .title-button-home {
+    width: 33%;
+  }
+
+  .img-home-page {
+    width: 33%;
+    height: 70%;
+    max-height: none;
+  }
+
+  .img-home-page img {
+    max-width: none;
+  }
+
+  .second-wave svg,
+  .third-wave svg,
+  .fourth-wave svg,
+  .five-wave svg,
+  .six-wave svg,
+  .seven-wave svg {
+    height: 100px;
+  }
+}
+
+/* Large desktop */
+@media screen and (min-width: 1350px) {
+  .title-home {
+    font-size: 2.2rem;
+  }
+}
+
+/* Fix for very small screens */
+@media screen and (max-width: 480px) {
+  .title-home {
+    width: 95%;
+    font-size: 1.3rem;
+  }
+
+  .img-home-page {
+    width: 95%;
+    max-height: 35vh;
+  }
+
+  .second-section,
+  .first-section,
+  .third-section,
+  .fourth-section,
+  .five-section,
+  .six-section {
+    padding: 20px 10px 60px;
+    gap: 70px;
+  }
+}
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .home-section {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 2rem 1rem;
+    min-height: 80vh;
+  }
+  .second-section,
+  .first-section,
+  .third-section,
+  .fourth-section,
+  .five-section,
+  .six-section {
+    padding: 20px 10px 60px;
+    gap: 20px;
+  }
+  .title {
+    font-size: 4vw;
+  }
+  .img-home-page {
+    width: 70%;
+    max-height: 30vh;
+  }
+
+  .img-home-page img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    max-height: 30vh;
   }
 }
